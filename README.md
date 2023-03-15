@@ -1,5 +1,5 @@
-# Ning Mall
+# Douya Mall
 
 ## 介绍
-柠柠购物项目
+豆芽购物项目
 
