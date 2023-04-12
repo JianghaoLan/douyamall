@@ -16,5 +16,8 @@
         <module>douyamall-order</module>
         <module>douyamall-product</module>
         <module>douyamall-ware</module>
+        <module>renren-fast</module>
+        <module>renren-generator</module>
+        <module>douyamall-common</module>
     </modules>
 </project>
