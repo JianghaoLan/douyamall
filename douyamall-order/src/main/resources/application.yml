@@ -1,0 +1,25 @@
+#配置数据源
+#应先导入数据库依赖
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://192.168.56.10:3306/douyamall_oms
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: douyamall-order
+
+#配置MyBatis-Plus
+#主类上添加MapperScan
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto   #自增主键
+
+server:
+  port: 9000
