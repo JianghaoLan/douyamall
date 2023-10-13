@@ -24,3 +24,6 @@ bin-release/
 
 .idea
 **/.gitignore
+
+# renren-generator
+renren-generator/generated
