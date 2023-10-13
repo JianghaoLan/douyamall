@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+    gateway:
+      routes:
+        - id : product_route
+          uri: lb://douyamall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:    # http://localhost:88/api/captcha.jpg => http://localhost:8080/renren-fast/captcha.jpg
+            - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedHeaders: "*"
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowCredentials: true
+
+server:
+  port: 88
