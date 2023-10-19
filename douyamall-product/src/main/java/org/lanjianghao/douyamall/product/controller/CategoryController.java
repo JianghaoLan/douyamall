@@ -48,7 +48,7 @@ public class CategoryController {
     public R info(@PathVariable("catId") Long catId){
 		CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
@@ -71,6 +71,12 @@ public class CategoryController {
         return R.ok();
     }
 
+    @RequestMapping("/update/batch")
+    public R updateBatch(@RequestBody CategoryEntity[] categories) {
+        categoryService.updateBatchById(Arrays.asList(categories));
+        return R.ok();
+    }
+
     /**
      * 删除
      */
@@ -80,5 +86,4 @@ public class CategoryController {
         categoryService.removeMenuByIds(Arrays.asList(catIds));
         return R.ok();
     }
-
 }
