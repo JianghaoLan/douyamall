@@ -20,5 +20,6 @@
         <module>renren-generator</module>
         <module>douyamall-common</module>
         <module>douyamall-gateway</module>
+        <module>douyamall-third-party</module>
     </modules>
 </project>

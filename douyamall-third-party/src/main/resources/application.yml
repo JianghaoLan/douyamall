@@ -1,0 +1,15 @@
+server:
+  port: 30000
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.2.132:8848
+#alibaba:
+#  cloud:
+#    access-key:
+#    secret-key:
+#    oss:
+#      endpoint: oss-cn-beijing.aliyuncs.com
+#      bucket: lanjianghao-douyamall
