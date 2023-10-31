@@ -17,6 +17,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-cloud.version>2021.0.6</spring-cloud.version>
+        <spring-boot.versin>2.7.10</spring-boot.versin>
     </properties>
 
     <dependencies>
@@ -73,6 +74,12 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
             <version>4.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>${spring-boot.versin}</version>
         </dependency>
 
     </dependencies>

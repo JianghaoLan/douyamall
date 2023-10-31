@@ -1,5 +1,7 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
+import org.lanjianghao.douyamall.product.dao.CategoryBrandRelationDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,10 +16,15 @@ import org.lanjianghao.common.utils.Query;
 import org.lanjianghao.douyamall.product.dao.CategoryDao;
 import org.lanjianghao.douyamall.product.entity.CategoryEntity;
 import org.lanjianghao.douyamall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    CategoryBrandRelationDao categoryBrandRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -68,6 +75,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void removeMenuByIds(List<Long> asList) {
         //TODO 检查要删除的菜单是否被别的地方引用
         baseMapper.deleteBatchIds(asList);
+    }
+
+    private void findCategoryPath(long categoryId, List<Long> path) {
+        CategoryEntity category = this.getById(categoryId);
+        if (category.getParentCid() != 0) {
+            findCategoryPath(category.getParentCid(), path);
+        }
+        path.add(categoryId);
+    }
+
+    @Override
+    public Long[] findCategoryPath(long categoryId) {
+        List<Long> path = new ArrayList<>();
+        findCategoryPath(categoryId, path);
+        Long[] pathArray = new Long[path.size()];
+        return path.toArray(pathArray);
+    }
+
+    @Override
+    @Transactional
+    public boolean updateCascadeById(CategoryEntity category) {
+        this.updateById(category);
+        if (category.getName() != null) {
+            categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
+        }
+        return true;
     }
 
     private int queryMaxCategoryLevel() {

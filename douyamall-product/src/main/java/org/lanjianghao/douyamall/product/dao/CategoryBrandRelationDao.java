@@ -1,5 +1,6 @@
 package org.lanjianghao.douyamall.product.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.lanjianghao.douyamall.product.entity.CategoryBrandRelationEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,5 +14,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface CategoryBrandRelationDao extends BaseMapper<CategoryBrandRelationEntity> {
-	
+	public boolean updateBrand(@Param("brandId") Long brandId, @Param("brandName") String brandName);
+
+	public boolean updateCategory(@Param("catelogId") Long catelogId, @Param("catelogName") String catelogName);
 }

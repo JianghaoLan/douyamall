@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.validation.groups.AddGroup;
+import org.lanjianghao.common.validation.groups.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +58,7 @@ public class CategoryController {
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody CategoryEntity category){
+    public R save(@Validated({AddGroup.class}) @RequestBody CategoryEntity category){
 		categoryService.save(category);
 
         return R.ok();
@@ -65,14 +68,15 @@ public class CategoryController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
+    public R update(@Validated({UpdateGroup.class}) @RequestBody CategoryEntity category){
+//		categoryService.updateById(category);
+		categoryService.updateCascadeById(category);
 
         return R.ok();
     }
 
     @RequestMapping("/update/batch")
-    public R updateBatch(@RequestBody CategoryEntity[] categories) {
+    public R updateBatch(@Validated({UpdateGroup.class}) @RequestBody CategoryEntity[] categories) {
         categoryService.updateBatchById(Arrays.asList(categories));
         return R.ok();
     }

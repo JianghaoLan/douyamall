@@ -1,14 +1,11 @@
 package org.lanjianghao.douyamall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.product.entity.CategoryBrandRelationEntity;
 import org.lanjianghao.douyamall.product.service.CategoryBrandRelationService;
@@ -40,6 +37,17 @@ public class CategoryBrandRelationController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 获取指定品牌关联的所有分类
+     * @param brandId
+     * @return
+     */
+    @GetMapping("/catelog/list")
+    public R listCatelog(@RequestParam("brandId") Long brandId){
+        List<CategoryBrandRelationEntity> data = categoryBrandRelationService.listCategory(brandId);
+
+        return R.ok().put("data", data);
+    }
 
     /**
      * 信息
@@ -56,7 +64,7 @@ public class CategoryBrandRelationController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
-		categoryBrandRelationService.save(categoryBrandRelation);
+		categoryBrandRelationService.saveDetail(categoryBrandRelation);
 
         return R.ok();
     }
