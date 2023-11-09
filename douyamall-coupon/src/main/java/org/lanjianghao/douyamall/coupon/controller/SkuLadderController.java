@@ -1,14 +1,14 @@
 package org.lanjianghao.douyamall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.lanjianghao.common.to.SkuLadderTo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.coupon.entity.SkuLadderEntity;
 import org.lanjianghao.douyamall.coupon.service.SkuLadderService;
@@ -57,6 +57,20 @@ public class SkuLadderController {
     @RequestMapping("/save")
     public R save(@RequestBody SkuLadderEntity skuLadder){
 		skuLadderService.save(skuLadder);
+
+        return R.ok();
+    }
+
+    @PostMapping("/save/batch")
+    public R saveBatch(@RequestBody List<SkuLadderTo> skuLadderTos){
+        List<SkuLadderEntity> SkuLadderEntities = skuLadderTos.stream().map(skuLadderTo -> {
+            SkuLadderEntity skuLadderEnt = new SkuLadderEntity();
+            BeanUtils.copyProperties(skuLadderTo, skuLadderEnt);
+            skuLadderEnt.setAddOther(skuLadderTo.getCountStatus());
+            return skuLadderEnt;
+        }).collect(Collectors.toList());
+
+        skuLadderService.saveBatch(SkuLadderEntities);
 
         return R.ok();
     }

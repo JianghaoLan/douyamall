@@ -53,5 +53,4 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
         }
         return true;
     }
-
 }

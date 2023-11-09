@@ -2,6 +2,7 @@ package org.lanjianghao.douyamall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
+import org.lanjianghao.douyamall.product.entity.BrandEntity;
 import org.lanjianghao.douyamall.product.entity.CategoryBrandRelationEntity;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
     List<CategoryBrandRelationEntity> listCategory(Long brandId);
 
     boolean saveDetail(CategoryBrandRelationEntity categoryBrandRelation);
+
+    List<BrandEntity> listBrands(Long catId);
 }
 

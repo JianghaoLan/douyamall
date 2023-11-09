@@ -1,0 +1,23 @@
+/**
+ * Copyright 2023 bejson.com
+ */
+package org.lanjianghao.douyamall.product.vo;
+
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * Auto-generated: 2023-11-07 21:39:6
+ *
+ * @author bejson.com (i@bejson.com)
+ * @website http://www.bejson.com/java2pojo/
+ */
+@Data
+public class MemberPrice {
+
+    private Long id;
+    private String name;
+    private BigDecimal price;
+
+}

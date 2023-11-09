@@ -3,7 +3,10 @@ package org.lanjianghao.douyamall.product.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.lanjianghao.douyamall.product.entity.BrandEntity;
+import org.lanjianghao.douyamall.product.vo.BriefBrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +50,19 @@ public class CategoryBrandRelationController {
         List<CategoryBrandRelationEntity> data = categoryBrandRelationService.listCategory(brandId);
 
         return R.ok().put("data", data);
+    }
+
+    @GetMapping("/brands/list")
+    public R listBrands(@RequestParam("catId") Long catId){
+        List<BrandEntity> brandEntities = categoryBrandRelationService.listBrands(catId);
+        List<BriefBrandVo> briefBrandVos = brandEntities.stream().map((entity) -> {
+            BriefBrandVo briefBrandVo = new BriefBrandVo();
+            briefBrandVo.setBrandId(entity.getBrandId());
+            briefBrandVo.setBrandName(entity.getName());
+            return briefBrandVo;
+        }).collect(Collectors.toList());
+
+        return R.ok().put("data", briefBrandVos);
     }
 
     /**

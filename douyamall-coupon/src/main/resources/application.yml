@@ -22,3 +22,6 @@
 
 #server:
 #  port: 7000
+logging:
+  level:
+    org.lanjianghao.douyamall: debug

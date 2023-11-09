@@ -11,6 +11,7 @@ import org.lanjianghao.common.utils.Query;
 import org.lanjianghao.douyamall.member.dao.MemberLevelDao;
 import org.lanjianghao.douyamall.member.entity.MemberLevelEntity;
 import org.lanjianghao.douyamall.member.service.MemberLevelService;
+import org.springframework.util.StringUtils;
 
 
 @Service("memberLevelService")
@@ -18,9 +19,14 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelDao, MemberLe
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<MemberLevelEntity> queryWrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        if (StringUtils.hasLength(key)) {
+            queryWrapper.eq("id", key).or().like("name", key);
+        }
         IPage<MemberLevelEntity> page = this.page(
                 new Query<MemberLevelEntity>().getPage(params),
-                new QueryWrapper<MemberLevelEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);

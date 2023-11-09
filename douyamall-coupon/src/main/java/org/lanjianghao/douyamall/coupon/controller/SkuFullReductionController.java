@@ -1,14 +1,14 @@
 package org.lanjianghao.douyamall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.lanjianghao.common.to.SkuFullReductionTo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.coupon.entity.SkuFullReductionEntity;
 import org.lanjianghao.douyamall.coupon.service.SkuFullReductionService;
@@ -57,6 +57,23 @@ public class SkuFullReductionController {
     @RequestMapping("/save")
     public R save(@RequestBody SkuFullReductionEntity skuFullReduction){
 		skuFullReductionService.save(skuFullReduction);
+
+        return R.ok();
+    }
+
+    /**
+     * 批量保存
+     */
+    @PostMapping("/save/batch")
+    public R saveBatch(@RequestBody List<SkuFullReductionTo> skuFullReductionTos){
+        List<SkuFullReductionEntity> entities = skuFullReductionTos.stream().map(to -> {
+            SkuFullReductionEntity ent = new SkuFullReductionEntity();
+            BeanUtils.copyProperties(to, ent);
+            ent.setAddOther(to.getPriceStatus());
+            return ent;
+        }).collect(Collectors.toList());
+
+        skuFullReductionService.saveBatch(entities);
 
         return R.ok();
     }

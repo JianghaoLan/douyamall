@@ -1,14 +1,13 @@
 package org.lanjianghao.douyamall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.lanjianghao.common.to.MemberPriceTo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.coupon.entity.MemberPriceEntity;
 import org.lanjianghao.douyamall.coupon.service.MemberPriceService;
@@ -57,6 +56,26 @@ public class MemberPriceController {
     @RequestMapping("/save")
     public R save(@RequestBody MemberPriceEntity memberPrice){
 		memberPriceService.save(memberPrice);
+
+        return R.ok();
+    }
+
+    /**
+     * 批量保存
+     */
+    @PostMapping("/save/batch")
+    public R saveBatch(@RequestBody List<MemberPriceTo> memberPriceTos){
+        List<MemberPriceEntity> entities = memberPriceTos.stream().map(to -> {
+            MemberPriceEntity ent = new MemberPriceEntity();
+            ent.setSkuId(to.getSkuId());
+            ent.setMemberLevelId(to.getId());
+            ent.setMemberLevelName(to.getName());
+            ent.setMemberPrice(to.getPrice());
+            ent.setAddOther(1);
+            return ent;
+        }).collect(Collectors.toList());
+
+        memberPriceService.saveBatch(entities);
 
         return R.ok();
     }

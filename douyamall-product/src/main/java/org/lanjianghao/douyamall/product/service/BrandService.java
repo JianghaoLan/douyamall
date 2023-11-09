@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.BrandEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**

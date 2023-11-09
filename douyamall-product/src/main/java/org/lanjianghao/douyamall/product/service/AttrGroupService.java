@@ -2,8 +2,11 @@ package org.lanjianghao.douyamall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
+import org.lanjianghao.douyamall.product.entity.AttrEntity;
 import org.lanjianghao.douyamall.product.entity.AttrGroupEntity;
+import org.lanjianghao.douyamall.product.vo.AttrGroupWithAttrsVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +21,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
+    List<AttrGroupWithAttrsVo> listAttrGroupsWithAttrsByCatelogId(Long catId);
 }
 
