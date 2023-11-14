@@ -18,7 +18,7 @@ public enum BizCodeEnum {
     /**
      * 10 通用
      */
-    UNKNOWN_EXCEPTION(1000, "系统未知异常"),
+    UNKNOWN_EXCEPTION(10000, "系统未知异常"),
     VALID_EXCEPTION(10001, "参数校验不通过"),
 
     /**

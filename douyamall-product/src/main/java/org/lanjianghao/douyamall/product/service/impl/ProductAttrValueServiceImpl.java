@@ -1,6 +1,8 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -11,6 +13,7 @@ import org.lanjianghao.common.utils.Query;
 import org.lanjianghao.douyamall.product.dao.ProductAttrValueDao;
 import org.lanjianghao.douyamall.product.entity.ProductAttrValueEntity;
 import org.lanjianghao.douyamall.product.service.ProductAttrValueService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("productAttrValueService")
@@ -24,6 +27,19 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<ProductAttrValueEntity> listAttrValuesBySpuId(Long spuId) {
+        return this.list(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+    }
+
+    @Transactional
+    @Override
+    public void updateAttrValuesBySpuId(Long spuId, List<ProductAttrValueEntity> attrValues) {
+        this.remove(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+        attrValues.forEach(attrValue -> attrValue.setSpuId(spuId));
+        this.saveBatch(attrValues);
     }
 
 }
