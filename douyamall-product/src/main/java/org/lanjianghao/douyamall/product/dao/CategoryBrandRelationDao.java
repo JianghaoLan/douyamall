@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface CategoryBrandRelationDao extends BaseMapper<CategoryBrandRelationEntity> {
-	public boolean updateBrand(@Param("brandId") Long brandId, @Param("brandName") String brandName);
+	boolean updateBrand(@Param("brandId") Long brandId, @Param("brandName") String brandName);
 
-	public boolean updateCategory(@Param("catelogId") Long catelogId, @Param("catelogName") String catelogName);
+	boolean updateCategory(@Param("catelogId") Long catelogId, @Param("catelogName") String catelogName);
 }

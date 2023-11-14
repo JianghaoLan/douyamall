@@ -1,20 +1,25 @@
 package org.lanjianghao.douyamall.ware.controller;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.constant.WareConstant;
+import org.lanjianghao.douyamall.ware.exception.IncorrectPurchaseItemsException;
+import org.lanjianghao.douyamall.ware.exception.IncorrectPurchaseStatusException;
+import org.lanjianghao.douyamall.ware.vo.CompletePurchaseVo;
+import org.lanjianghao.douyamall.ware.vo.MergePurchaseVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.ware.entity.PurchaseEntity;
 import org.lanjianghao.douyamall.ware.service.PurchaseService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.common.utils.R;
 
+import javax.validation.Valid;
 
 
 /**
@@ -40,6 +45,16 @@ public class PurchaseController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 累出未接收的订单
+     */
+    @RequestMapping("/unreceive/list")
+    public R listUnreceived(@RequestParam Map<String, Object> params){
+        PageUtils page = purchaseService.queryUnreceivedPage(params);
+
+        return R.ok().put("page", page);
+    }
+
 
     /**
      * 信息
@@ -54,9 +69,37 @@ public class PurchaseController {
     /**
      * 保存
      */
+    @RequestMapping("/merge")
+    public R merge(@RequestBody MergePurchaseVo mergeVo){
+        purchaseService.mergePurchase(mergeVo);
+
+        return R.ok();
+    }
+
+    /**
+     * 保存
+     */
     @RequestMapping("/save")
     public R save(@RequestBody PurchaseEntity purchase){
+        purchase.setCreateTime(new Date());
+        purchase.setUpdateTime(new Date());
+        purchase.setStatus(WareConstant.PurchaseEnum.PURCHASE_STATUS_CREATED.getCode());
 		purchaseService.save(purchase);
+
+        return R.ok();
+    }
+
+    @PostMapping("/received")
+    public R receive(@RequestBody List<Long> purchaseIds) {
+        purchaseService.receive(purchaseIds);
+
+        return R.ok();
+    }
+
+    @PostMapping("/done")
+    public R completePurchase(@RequestBody @Validated CompletePurchaseVo vo)
+            throws IncorrectPurchaseItemsException, IncorrectPurchaseStatusException {
+        purchaseService.completePurchase(vo);
 
         return R.ok();
     }

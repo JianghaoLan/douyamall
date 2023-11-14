@@ -1,4 +1,4 @@
-package org.lanjianghao.douyamall.product.config;
+package org.lanjianghao.douyamall.ware.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -8,10 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.util.Properties;
-
 @Configuration
-@MapperScan("org.lanjianghao.douyamall.product.dao")
+@MapperScan("org.lanjianghao.douyamall.ware.dao")
 @EnableTransactionManagement
 public class MybatisPlusConfig {
 

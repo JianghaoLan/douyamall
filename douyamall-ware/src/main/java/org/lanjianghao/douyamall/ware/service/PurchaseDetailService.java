@@ -16,5 +16,9 @@ import java.util.Map;
 public interface PurchaseDetailService extends IService<PurchaseDetailEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    boolean allDone(Long purchaseId);
+
+    boolean hasFailedItem(Long purchaseId);
 }
 

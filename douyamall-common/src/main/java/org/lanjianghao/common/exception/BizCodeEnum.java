@@ -9,16 +9,29 @@ package org.lanjianghao.common.exception;
  *  10: 通用
  *      001：参数格式校验
  *  11: 商品
- *  12: 订单
- *  13: 购物车
- *  14: 物流
+ *  12: 库存
+ *  13: 订单
+ *  14: 购物车
+ *  15: 物流
  */
 public enum BizCodeEnum {
+    /**
+     * 10 通用
+     */
     UNKNOWN_EXCEPTION(1000, "系统未知异常"),
-    VALID_EXCEPTION(10001, "参数校验不通过");
+    VALID_EXCEPTION(10001, "参数校验不通过"),
 
-    private int code;
-    private String message;
+    /**
+     * 12 库存
+     */
+    INCORRECT_PURCHASE_ITEMS_EXCEPTION(12001, "采购需求有误"),
+    INCORRECT_PURCHASE_STATUS_EXCEPTION(12002, "采购单状态有误")
+
+    ;
+
+
+    private final int code;
+    private final String message;
     BizCodeEnum(int code, String message) {
         this.code = code;
         this.message = message;

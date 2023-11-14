@@ -3,7 +3,9 @@ package org.lanjianghao.douyamall.ware.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.ware.entity.WareSkuEntity;
+import org.lanjianghao.douyamall.ware.vo.AddStockVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,7 @@ import java.util.Map;
 public interface WareSkuService extends IService<WareSkuEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void addStocks(List<AddStockVo> addStockVos);
 }
 

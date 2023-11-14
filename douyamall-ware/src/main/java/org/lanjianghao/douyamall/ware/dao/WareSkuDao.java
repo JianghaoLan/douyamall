@@ -1,8 +1,12 @@
 package org.lanjianghao.douyamall.ware.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.lanjianghao.douyamall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.lanjianghao.douyamall.ware.vo.AddStockVo;
+
+import java.util.List;
 
 /**
  * 商品库存
@@ -13,5 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
-	
+	int addStock(@Param("addStockVo") AddStockVo addStockVo);
 }
