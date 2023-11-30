@@ -1,0 +1,11 @@
+
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.2.132:8848
+  application:
+    name: douyamall-search
+server:
+  port: 12000

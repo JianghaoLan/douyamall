@@ -1,14 +1,12 @@
 package org.lanjianghao.douyamall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.to.SkuHasStockTo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.ware.entity.WareSkuEntity;
 import org.lanjianghao.douyamall.ware.service.WareSkuService;
@@ -81,4 +79,13 @@ public class WareSkuController {
         return R.ok();
     }
 
+    /**
+     * 批量查询sku是否有库存
+     */
+    @PostMapping("/list/hasstock")
+    public R listHasStocksBySkuIds(@RequestBody List<Long> skuIds) {
+        List<SkuHasStockTo> vos = wareSkuService.listHasStocksBySkuIds(skuIds);
+
+        return R.ok().put("data", vos);
+    }
 }

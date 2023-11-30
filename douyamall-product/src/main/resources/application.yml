@@ -13,6 +13,8 @@ spring:
         server-addr: 172.16.2.132:8848
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  thymeleaf:
+    cache: false
 
 #配置MyBatis-Plus
 #主类上添加MapperScan

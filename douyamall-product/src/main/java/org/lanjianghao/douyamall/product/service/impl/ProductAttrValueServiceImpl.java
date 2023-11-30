@@ -41,5 +41,4 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         attrValues.forEach(attrValue -> attrValue.setSpuId(spuId));
         this.saveBatch(attrValues);
     }
-
 }

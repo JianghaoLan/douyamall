@@ -3,11 +3,14 @@ package org.lanjianghao.douyamall.ware.service.impl;
 import org.lanjianghao.common.utils.R;
 import org.lanjianghao.douyamall.ware.feign.ProductFeignService;
 import org.lanjianghao.douyamall.ware.vo.AddStockVo;
+import org.lanjianghao.common.to.SkuHasStockTo;
+import org.lanjianghao.douyamall.ware.vo.SkuStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -85,5 +88,27 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             }
         });
     }
+
+    @Override
+    public List<SkuHasStockTo> listHasStocksBySkuIds(List<Long> skuIds) {
+        List<SkuStockVo> stockVos = this.getBaseMapper().selectUnlockedStocksBySkuIds(skuIds);
+        return stockVos.stream().map(vo -> {
+            SkuHasStockTo to = new SkuHasStockTo();
+            to.setSkuId(vo.getSkuId());
+            to.setHasStock(vo.getStock() > 0);
+            return to;
+        }).collect(Collectors.toList());
+
+//        return skuIds.stream().map(skuId -> {
+//            SkuHasStockTo vo = new SkuHasStockTo();
+//            vo.setSkuId(skuId);
+//
+//            long stock = this.getBaseMapper().selectUnlockedStockBySkuId(skuId);
+//            vo.setHasStock(stock > 0);
+//
+//            return vo;
+//        }).collect(Collectors.toList());
+    }
+
 
 }

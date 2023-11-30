@@ -8,6 +8,8 @@
 
 package org.lanjianghao.common.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -20,7 +22,7 @@ import java.util.Map;
  */
 public class R extends HashMap<String, Object> {
 	private static final long serialVersionUID = 1L;
-	
+
 	public R() {
 		put("code", 0);
 		put("msg", "success");
@@ -64,5 +66,10 @@ public class R extends HashMap<String, Object> {
 
 	public int getCode() {
 		return (int) get("code");
+	}
+
+	public <T> T get(String key, TypeReference<T> typeReference) {
+		final ObjectMapper mapper = new ObjectMapper();
+		return mapper.convertValue(this.get(key), typeReference);
 	}
 }

@@ -1,12 +1,14 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
-import org.lanjianghao.common.to.MemberPriceTo;
-import org.lanjianghao.common.to.SkuFullReductionTo;
-import org.lanjianghao.common.to.SkuLadderTo;
-import org.lanjianghao.common.to.SpuBoundTo;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.lanjianghao.common.constant.ProductConstant;
+import org.lanjianghao.common.to.*;
 import org.lanjianghao.common.utils.R;
 import org.lanjianghao.douyamall.product.entity.*;
 import org.lanjianghao.douyamall.product.feign.CouponFeignService;
+import org.lanjianghao.douyamall.product.feign.SearchFeignService;
+import org.lanjianghao.douyamall.product.feign.WareFeignService;
 import org.lanjianghao.douyamall.product.service.*;
 import org.lanjianghao.douyamall.product.vo.*;
 import org.springframework.beans.BeanUtils;
@@ -54,6 +56,18 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     CouponFeignService couponFeignService;
+
+    @Autowired
+    BrandService brandService;
+
+    @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    WareFeignService wareFeignService;
+
+    @Autowired
+    SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -254,5 +268,70 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void upSpu(Long spuId) {
+
+        //get attrs
+        List<ProductAttrValueEntity> productAttrValues = productAttrValueService.listAttrValuesBySpuId(spuId);
+        List<SkuEsModel.Attr> attrs = productAttrValues.stream().map(attrValue -> {
+            SkuEsModel.Attr attr = new SkuEsModel.Attr();
+            BeanUtils.copyProperties(attrValue, attr);
+            return attr;
+        }).collect(Collectors.toList());
+
+        //get skuInfos
+        List<SkuInfoEntity> skuInfos = skuInfoService.getSkusBySpuId(spuId);
+
+        //get hasStock
+        List<Long> skuIds = skuInfos.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        Map<Long, Boolean> hasStockMap = Collections.emptyMap();
+        try {
+            R hasStocksR = wareFeignService.listHasStocksBySkuIds(skuIds);
+            List<SkuHasStockTo> hasStocks = hasStocksR.get("data", new TypeReference<List<SkuHasStockTo>>(){});
+            hasStockMap = hasStocks.stream().collect(Collectors.toMap(
+                    SkuHasStockTo::getSkuId,
+                    SkuHasStockTo::getHasStock
+            ));
+        } catch (Exception e) {
+            log.error("查询库存服务异常，原因：{}", e);
+        }
+
+        Map<Long, Boolean> finalHasStockMap = hasStockMap;
+        List<SkuEsModel> skuEsModels = skuInfos.stream().map(skuInfo -> {
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(skuInfo, skuEsModel);
+            skuEsModel.setSkuPrice(skuInfo.getPrice());
+            skuEsModel.setSkuImg(skuInfo.getSkuDefaultImg());
+
+            //hotScore: 默认为0
+            skuEsModel.setHotScore(0L);
+
+            //hasStock
+            skuEsModel.setHasStock(finalHasStockMap.getOrDefault(skuInfo.getSkuId(), true));
+
+            //brandName, brandImg
+            BrandEntity brand = brandService.getById(skuEsModel.getBrandId());
+            skuEsModel.setBrandName(brand.getName());
+            skuEsModel.setBrandImg(brand.getLogo());
+
+            //catalogName
+            skuEsModel.setCatalogName(categoryService.getById(skuEsModel.getCatalogId()).getName());
+
+            //attrs
+            skuEsModel.setAttrs(attrs);
+
+            return skuEsModel;
+
+        }).collect(Collectors.toList());
+
+        R r = searchFeignService.saveProducts(skuEsModels);
+        if (r.getCode() == 0) {
+            //修改数据库中上架状态
+            baseMapper.updatePublishStatus(spuId, ProductConstant.PublishStatusEnum.UP.getCode());
+        } else {
+            //TODO 失败重复调用/接口幂等性/重试机制
+        }
     }
 }

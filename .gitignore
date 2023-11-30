@@ -27,3 +27,6 @@ bin-release/
 
 # renren-generator
 renren-generator/generated
+
+# static
+**/resources/static
