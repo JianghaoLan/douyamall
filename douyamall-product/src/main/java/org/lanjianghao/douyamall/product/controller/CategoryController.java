@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.lanjianghao.douyamall.product.entity.CategoryEntity;
 import org.lanjianghao.douyamall.product.service.CategoryService;
-import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.common.utils.R;
 
 

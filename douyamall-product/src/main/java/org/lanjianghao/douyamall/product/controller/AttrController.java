@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.utils.R;
 import org.lanjianghao.douyamall.product.entity.ProductAttrValueEntity;
 import org.lanjianghao.douyamall.product.service.ProductAttrValueService;
+import org.lanjianghao.douyamall.product.vo.AttrNameVo;
 import org.lanjianghao.douyamall.product.vo.AttrRespVo;
 import org.lanjianghao.douyamall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.lanjianghao.douyamall.product.entity.AttrEntity;
 import org.lanjianghao.douyamall.product.service.AttrService;
 import org.lanjianghao.common.utils.PageUtils;
-import org.lanjianghao.common.utils.R;
 
 
 
@@ -59,6 +60,11 @@ public class AttrController {
         return R.ok().put("page", page);
     }
 
+    @PostMapping("/list/attrNames")
+    public R attrNames(@RequestBody List<Long> attrIds) {
+        List<AttrNameVo> attrNames = attrService.listAttrNames(attrIds);
+        return R.ok().put("data", attrNames);
+    }
 
     /**
      * 信息

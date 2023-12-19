@@ -27,13 +27,14 @@ public class DouyamallElasticSearchConfig extends AbstractElasticsearchConfigura
 
     @NotNull
     @Bean
+    @Override
     public RestHighLevelClient elasticsearchClient() {
         return esRestClient.rest();
     }
 
     @NotNull
     @Bean
-    public ElasticsearchClient restClientTransport() {
+    public ElasticsearchClient esJavaClient() {
         ElasticsearchTransport transport =
                 new RestClientTransport(esRestClient.lowLevelRest(), new JacksonJsonpMapper());
         return new ElasticsearchClient(transport);

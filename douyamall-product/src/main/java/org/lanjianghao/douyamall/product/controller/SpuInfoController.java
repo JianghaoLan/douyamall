@@ -88,5 +88,4 @@ public class SpuInfoController {
         spuInfoService.upSpu(spuId);
         return R.ok();
     }
-
 }

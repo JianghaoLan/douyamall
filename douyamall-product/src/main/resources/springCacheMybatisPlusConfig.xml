@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/cache https://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+    <!-- cache definitions -->
+    <cache:advice id="categoryCacheAdvice" cache-manager="cacheManager">
+        <cache:caching cache="category">
+<!--            <cache:cacheable method="save" key="#isbn"/>-->
+            <cache:cache-evict method="save" all-entries="true"/>
+            <cache:cache-evict method="saveBatch" all-entries="true"/>
+            <cache:cache-evict method="update" all-entries="true"/>
+            <cache:cache-evict method="updateById" all-entries="true"/>
+        </cache:caching>
+    </cache:advice>
+
+    <!-- apply the cacheable behavior to all BookService interfaces -->
+    <aop:config>
+        <aop:advisor advice-ref="categoryCacheAdvice"
+                     pointcut="execution(* org.lanjianghao.douyamall.product.service.CategoryService.*(..))"/>
+    </aop:config>
+
+</beans>

@@ -1,5 +1,4 @@
 
-
 spring:
   cloud:
     nacos:
@@ -7,5 +6,9 @@ spring:
         server-addr: 172.16.2.132:8848
   application:
     name: douyamall-search
+  thymeleaf:
+    cache: false
+  messages:
+    basename:
 server:
   port: 12000

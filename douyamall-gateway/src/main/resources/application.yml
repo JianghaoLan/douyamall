@@ -41,6 +41,16 @@ spring:
           filters:    # http://localhost:88/api/captcha.jpg => http://localhost:8080/renren-fast/captcha.jpg
             - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
 
+        - id: host_route
+          uri: lb://douyamall-product
+          predicates:
+            - Host=douyamall.com
+
+        - id: search_route
+          uri: lb://douyamall-search
+          predicates:
+            - Host=search.douyamall.com
+
       globalcors:
         cors-configurations:
           '[/**]':

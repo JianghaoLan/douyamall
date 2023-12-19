@@ -1,24 +1,20 @@
 package org.lanjianghao.douyamall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.lanjianghao.common.validation.groups.AddGroup;
 import org.lanjianghao.common.validation.groups.UpdateGroup;
+import org.lanjianghao.douyamall.product.vo.BrandNameVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.product.entity.BrandEntity;
 import org.lanjianghao.douyamall.product.service.BrandService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.common.utils.R;
-
-import javax.validation.Valid;
 
 
 /**
@@ -88,4 +84,10 @@ public class BrandController {
         return R.ok();
     }
 
+    @PostMapping("/list/brandName")
+    public R listBrandNames(@RequestBody List<Long> brandIds) {
+        List<BrandNameVo> vos = brandService.listBrandNames(brandIds);
+
+        return R.ok().put("data", vos);
+    }
 }

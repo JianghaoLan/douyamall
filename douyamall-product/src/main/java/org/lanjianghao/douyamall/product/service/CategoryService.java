@@ -3,6 +3,7 @@ package org.lanjianghao.douyamall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.CategoryEntity;
+import org.lanjianghao.douyamall.product.vo.Catalog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -25,5 +26,8 @@ public interface CategoryService extends IService<CategoryEntity> {
     Long[] findCategoryPath(long categoryId);
 
     boolean updateCascadeById(CategoryEntity category);
-}
 
+    List<CategoryEntity> listTopLevelCategories();
+
+    Map<String, List<Catalog2Vo>> getCatalogJson();
+}

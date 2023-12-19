@@ -1,8 +1,12 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
 import org.lanjianghao.douyamall.product.dao.CategoryBrandRelationDao;
+import org.lanjianghao.douyamall.product.vo.BrandNameVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,6 +18,7 @@ import org.lanjianghao.douyamall.product.dao.BrandDao;
 import org.lanjianghao.douyamall.product.entity.BrandEntity;
 import org.lanjianghao.douyamall.product.service.BrandService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -52,5 +57,13 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
             //TODO 更新其它关联
         }
         return true;
+    }
+
+    @Override
+    public List<BrandNameVo> listBrandNames(List<Long> brandIds) {
+        if (CollectionUtils.isEmpty(brandIds)) {
+            return Collections.emptyList();
+        }
+        return this.baseMapper.selectBrandNames(brandIds);
     }
 }

@@ -9,6 +9,7 @@ import org.lanjianghao.douyamall.product.entity.AttrAttrgroupRelationEntity;
 import org.lanjianghao.douyamall.product.entity.AttrGroupEntity;
 import org.lanjianghao.douyamall.product.entity.CategoryEntity;
 import org.lanjianghao.douyamall.product.service.CategoryService;
+import org.lanjianghao.douyamall.product.vo.AttrNameVo;
 import org.lanjianghao.douyamall.product.vo.AttrRespVo;
 import org.lanjianghao.douyamall.product.vo.AttrVo;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +29,7 @@ import org.lanjianghao.douyamall.product.dao.AttrDao;
 import org.lanjianghao.douyamall.product.entity.AttrEntity;
 import org.lanjianghao.douyamall.product.service.AttrService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -228,5 +230,13 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), attrQueryWrapper);
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<AttrNameVo> listAttrNames(List<Long> attrIds) {
+        if (CollectionUtils.isEmpty(attrIds)) {
+            return Collections.emptyList();
+        }
+        return this.baseMapper.selectAttrNamesByIds(attrIds);
     }
 }

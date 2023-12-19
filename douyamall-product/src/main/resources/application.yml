@@ -14,7 +14,19 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
-    cache: false
+    cache: false      # 取消thymeleaf缓存，以便实时看到更新后的页面。另外还需要开启devtools
+  redis:
+    host: 172.16.2.132
+    port: 6379
+#    password:
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1h
+      cache-null-values: true
+      key-prefix: CACHE_
+      use-key-prefix: true
+
 
 #配置MyBatis-Plus
 #主类上添加MapperScan

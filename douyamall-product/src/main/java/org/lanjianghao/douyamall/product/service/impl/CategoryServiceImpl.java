@@ -1,11 +1,17 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.lanjianghao.douyamall.product.dao.CategoryBrandRelationDao;
+import org.lanjianghao.douyamall.product.redis.CategoryRepository;
+import org.lanjianghao.douyamall.product.vo.Catalog2Vo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,7 +23,6 @@ import org.lanjianghao.douyamall.product.dao.CategoryDao;
 import org.lanjianghao.douyamall.product.entity.CategoryEntity;
 import org.lanjianghao.douyamall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 
 @Service("categoryService")
@@ -25,6 +30,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     CategoryBrandRelationDao categoryBrandRelationDao;
+
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
+    RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -71,6 +82,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return topLevelCategories;
     }
 
+    @CacheEvict(cacheNames = "category", allEntries = true)
     @Override
     public void removeMenuByIds(List<Long> asList) {
         //TODO 检查要删除的菜单是否被别的地方引用
@@ -93,6 +105,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return path.toArray(pathArray);
     }
 
+    @CacheEvict(cacheNames = "category", allEntries = true)
     @Override
     @Transactional
     public boolean updateCascadeById(CategoryEntity category) {
@@ -101,6 +114,87 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
         }
         return true;
+    }
+
+    @Cacheable(value = "category", key = "#root.method.name", sync = true)
+    @Override
+    public List<CategoryEntity> listTopLevelCategories() {
+        return this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+//        return null;
+    }
+
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatalogJson() {
+        Map<String, List<Catalog2Vo>> result = null;
+        try {
+            result = categoryRepository.getIndexCatalog();
+        } catch (JsonProcessingException ignored) {}
+
+        if (result != null) {
+            return result;
+        }
+
+
+        RLock lock = redisson.getLock("indexCatalogLock");
+
+        lock.lock();
+        try {
+            try {
+                result = categoryRepository.getIndexCatalog();
+            } catch (JsonProcessingException ignored) {}
+            if (result != null) {
+                return result;
+            }
+
+            //查询数据库
+//            System.out.println("查询了数据库");
+            result = getCatalogJsonFromDb();
+            //写入redis
+            try {
+                categoryRepository.setIndexCatalog(result);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            lock.unlock();
+        }
+////        System.out.println("缓存不存在，将要查询数据库");
+//        //本地锁
+//        synchronized (this) {
+//
+//        }
+
+        return result;
+    }
+
+    private Map<String, List<Catalog2Vo>> getCatalogJsonFromDb() {
+        List<CategoryEntity> categoryEntities = this.list();
+
+        Map<String, List<Catalog2Vo>> catL1Map = new HashMap<>();
+        Map<String, Catalog2Vo> catL2Map = new HashMap<>();
+        List<Catalog2Vo.Catalog3> catL3List = new ArrayList<>();
+        categoryEntities.forEach(cat -> {
+            if (cat.getCatLevel() == 1) {
+                catL1Map.put(cat.getCatId().toString(), new ArrayList<>());
+            } else if (cat.getCatLevel() == 2) {
+                Catalog2Vo vo = new Catalog2Vo(cat.getParentCid().toString(),
+                        new ArrayList<>(), cat.getCatId().toString(), cat.getName());
+                catL2Map.put(cat.getCatId().toString(), vo);
+            } else if (cat.getCatLevel() == 3) {
+                Catalog2Vo.Catalog3 catalog3 = new Catalog2Vo.Catalog3(cat.getParentCid().toString(),
+                        cat.getCatId().toString(), cat.getName());
+                catL3List.add(catalog3);
+            }
+        });
+
+        catL3List.forEach(catL3 -> {
+            catL2Map.get(catL3.getCatalog2Id()).getCatalog3List().add(catL3);
+        });
+        catL2Map.forEach((key, value) -> {
+            catL1Map.get(value.getCatalog1Id()).add(value);
+        });
+
+        return catL1Map;
     }
 
     private int queryMaxCategoryLevel() {

@@ -13,6 +13,16 @@
         <result property="firstLetter" column="first_letter"/>
         <result property="sort" column="sort"/>
     </resultMap>
-
-
+    <resultMap id="categoryNameMap" type="org.lanjianghao.douyamall.product.vo.BrandNameVo">
+        <result property="brandId" column="brand_id"/>
+        <result property="brandName" column="name"/>
+    </resultMap>
+    <select id="selectBrandNames" resultMap="categoryNameMap">
+        SELECT brand_id, name FROM `pms_brand`
+        <where>
+            <foreach item="brandId" collection="brandIds" open="brand_id in (" separator="," close=")">
+                #{brandId}
+            </foreach>
+        </where>
+    </select>
 </mapper>

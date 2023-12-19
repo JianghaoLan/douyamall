@@ -1,8 +1,13 @@
 package org.lanjianghao.douyamall.product.dao;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.lanjianghao.douyamall.product.entity.AttrEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.lanjianghao.douyamall.product.vo.AttrNameVo;
+
+import java.util.List;
 
 /**
  * 商品属性
@@ -13,5 +18,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AttrDao extends BaseMapper<AttrEntity> {
-	
+
+    List<AttrNameVo> selectAttrNamesByIds(@Param("attrIds") List<Long> attrIds);
 }

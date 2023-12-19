@@ -3,6 +3,7 @@ package org.lanjianghao.douyamall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.AttrEntity;
+import org.lanjianghao.douyamall.product.vo.AttrNameVo;
 import org.lanjianghao.douyamall.product.vo.AttrRespVo;
 import org.lanjianghao.douyamall.product.vo.AttrVo;
 
@@ -31,5 +32,7 @@ public interface AttrService extends IService<AttrEntity> {
     List<AttrEntity> listRelatedAttrs(Long attrgroupId);
 
     PageUtils queryNoRelationAttrsPage(Map<String, Object> params, Long attrgroupId);
+
+    List<AttrNameVo> listAttrNames(List<Long> attrIds);
 }
 
