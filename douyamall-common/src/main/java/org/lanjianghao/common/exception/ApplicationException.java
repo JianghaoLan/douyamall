@@ -1,6 +1,6 @@
 package org.lanjianghao.common.exception;
 
-public class ApplicationException extends Exception {
+public class ApplicationException extends RuntimeException {
     private final BizCodeEnum bizCodeEnum;
 
     public ApplicationException(BizCodeEnum biz) {

@@ -1,0 +1,13 @@
+server:
+  port: 20000
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.2.132:8848
+  thymeleaf:
+    cache: false
+  redis:
+    host: 172.16.2.132
+    port: 6379

@@ -32,4 +32,9 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelDao, MemberLe
         return new PageUtils(page);
     }
 
+    @Override
+    public Long getDefaultLevelId() {
+        return this.baseMapper.selectDefaultLevelId();
+    }
+
 }

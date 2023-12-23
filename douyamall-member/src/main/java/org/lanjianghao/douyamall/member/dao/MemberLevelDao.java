@@ -1,5 +1,7 @@
 package org.lanjianghao.douyamall.member.dao;
 
+import org.apache.ibatis.annotations.Select;
+import org.lanjianghao.common.constant.MemberConstant;
 import org.lanjianghao.douyamall.member.entity.MemberLevelEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,5 +15,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface MemberLevelDao extends BaseMapper<MemberLevelEntity> {
-	
+    @Select("SELECT `id` FROM `ums_member_level` WHERE default_status = 1")
+    Long selectDefaultLevelId();
 }

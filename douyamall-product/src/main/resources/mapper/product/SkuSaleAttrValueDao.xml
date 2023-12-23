@@ -12,6 +12,23 @@
         <result property="attrValue" column="attr_value"/>
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
-
-
+    <resultMap type="org.lanjianghao.douyamall.product.vo.SkuSaleAttr" id="skuSaleAttrMap">
+        <result property="attrId" column="attr_id" />
+        <result property="attrName" column="attr_name" />
+        <collection property="attrValues" ofType="org.lanjianghao.douyamall.product.vo.SaleAttrValueWithSkuIds">
+            <result property="value" column="attr_value" />
+            <collection property="skuIds" ofType="long">
+                <constructor>
+                    <arg column="sku_id" javaType="Long"/>
+                </constructor>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="selectSaleAttrsBySpuId" resultMap="skuSaleAttrMap">
+        SELECT attr_value.`attr_id`, attr_value.`attr_name`, attr_value.`attr_value`, sku.`sku_id`
+        FROM `pms_sku_info` sku
+        LEFT JOIN `pms_sku_sale_attr_value` attr_value ON attr_value.`sku_id` = sku.`sku_id`
+        WHERE sku.`spu_id` = #{spuId}
+--         GROUP BY attr_value.`attr_id`, attr_value.`attr_name`, attr_value.`attr_value`
+    </select>
 </mapper>

@@ -2,11 +2,11 @@ package org.lanjianghao.douyamall.product.service.impl;
 
 import org.lanjianghao.douyamall.product.dao.AttrAttrgroupRelationDao;
 import org.lanjianghao.douyamall.product.dao.AttrDao;
-import org.lanjianghao.douyamall.product.entity.AttrAttrgroupRelationEntity;
-import org.lanjianghao.douyamall.product.entity.AttrEntity;
 import org.lanjianghao.douyamall.product.service.AttrAttrgroupRelationService;
 import org.lanjianghao.douyamall.product.service.AttrService;
+import org.lanjianghao.douyamall.product.service.ProductAttrValueService;
 import org.lanjianghao.douyamall.product.vo.AttrGroupWithAttrsVo;
+import org.lanjianghao.douyamall.product.vo.SpuBaseAttrGroup;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     AttrService attrService;
     @Autowired
     AttrAttrgroupRelationService relationService;
+
+    @Autowired
+    ProductAttrValueService productAttrValueService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -79,5 +82,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             vo.setAttrs(attrService.listRelatedAttrs(group.getAttrGroupId()));
             return vo;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SpuBaseAttrGroup> listAttrGroupBySpuId(Long spuId) {
+        return this.baseMapper.selectAttrGroupBySpuId(spuId);
     }
 }

@@ -3,7 +3,9 @@ package org.lanjianghao.douyamall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.SkuSaleAttrValueEntity;
+import org.lanjianghao.douyamall.product.vo.SkuSaleAttr;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +18,9 @@ import java.util.Map;
 public interface SkuSaleAttrValueService extends IService<SkuSaleAttrValueEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    List<SkuSaleAttrValueEntity> listBySkuId(Long skuId);
+
+    List<SkuSaleAttr> listSaleAttrBySpuId(Long spuId);
 }
 

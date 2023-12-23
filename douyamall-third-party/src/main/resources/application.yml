@@ -13,3 +13,11 @@ spring:
 #    oss:
 #      endpoint: oss-cn-beijing.aliyuncs.com
 #      bucket: lanjianghao-douyamall
+
+#短信服务
+sms:
+  host: https://wwsms.market.alicloudapi.com
+  path: /send_sms
+  template-id: TPL_0001
+  app-code: 963bed44cfa6419981509d118a66daff
+

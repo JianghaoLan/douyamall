@@ -1,8 +1,13 @@
 package org.lanjianghao.douyamall.product.dao;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.lanjianghao.douyamall.product.entity.ProductAttrValueEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.lanjianghao.douyamall.product.vo.SkuItemVo;
+
+import java.util.List;
 
 /**
  * spu属性值
@@ -13,5 +18,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ProductAttrValueDao extends BaseMapper<ProductAttrValueEntity> {
-	
+
+//    @Select("SELECT attr_name, attr_value FROM `pms_product_attr_value` WHERE spuId = #{spuId}")
+//    List<SkuItemVo.SpuBaseAttr> selectAttrGroupBySpuId(@Param("spuId") Long spuId);
 }

@@ -68,6 +68,10 @@ public class R extends HashMap<String, Object> {
 		return (int) get("code");
 	}
 
+	public String getMsg() {
+		return (String) get("msg");
+	}
+
 	public <T> T get(String key, TypeReference<T> typeReference) {
 		final ObjectMapper mapper = new ObjectMapper();
 		return mapper.convertValue(this.get(key), typeReference);

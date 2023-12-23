@@ -44,12 +44,17 @@ spring:
         - id: host_route
           uri: lb://douyamall-product
           predicates:
-            - Host=douyamall.com
+            - Host=douyamall.com, item.douyamall.com
 
         - id: search_route
           uri: lb://douyamall-search
           predicates:
             - Host=search.douyamall.com
+
+        - id: auth_route
+          uri: lb://douyamall-auth
+          predicates:
+            - Host=auth.douyamall.com
 
       globalcors:
         cors-configurations:

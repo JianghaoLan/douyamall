@@ -1,10 +1,20 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
+import org.lanjianghao.douyamall.product.entity.*;
+import org.lanjianghao.douyamall.product.service.*;
+import org.lanjianghao.douyamall.product.vo.SkuItemVo;
+import org.lanjianghao.douyamall.product.vo.SkuSaleAttr;
+import org.lanjianghao.douyamall.product.vo.SpuBaseAttrGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,13 +22,26 @@ import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.common.utils.Query;
 
 import org.lanjianghao.douyamall.product.dao.SkuInfoDao;
-import org.lanjianghao.douyamall.product.entity.SkuInfoEntity;
-import org.lanjianghao.douyamall.product.service.SkuInfoService;
 import org.springframework.util.StringUtils;
 
 
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService {
+
+    @Autowired
+    SpuInfoDescService spuInfoDescService;
+
+    @Autowired
+    SkuImagesService skuImagesService;
+
+    @Autowired
+    SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    AttrGroupService attrGroupService;
+
+    @Autowired
+    ThreadPoolExecutor executor;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -84,4 +107,44 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         return this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
     }
 
+    @Override
+    public SkuItemVo getItem(Long skuId) {
+        SkuItemVo item = new SkuItemVo();
+
+        CompletableFuture<SkuInfoEntity> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
+            //set sku info
+            SkuInfoEntity skuInfo = this.getById(skuId);
+            item.setInfo(skuInfo);
+            return skuInfo;
+        }, executor);
+
+        CompletableFuture<Void> descFuture = skuInfoFuture.thenAcceptAsync(info -> {
+            //set desc
+            SpuInfoDescEntity spuInfoDesc = spuInfoDescService.getById(info.getSpuId());
+            item.setDesc(spuInfoDesc);
+        }, executor);
+
+        CompletableFuture<Void> saleAttrsFuture = skuInfoFuture.thenAcceptAsync(info -> {
+            //set sale attrs
+            List<SkuSaleAttr> saleAttrs = skuSaleAttrValueService.listSaleAttrBySpuId(info.getSpuId());
+            item.setSaleAttrs(saleAttrs);
+        }, executor);
+
+        CompletableFuture<Void> attrGroupsFuture = skuInfoFuture.thenAcceptAsync(info -> {
+            //set attr groups
+            List<SpuBaseAttrGroup> baseAttrGroups = attrGroupService.listAttrGroupBySpuId(info.getSpuId());
+            item.setAttrGroups(baseAttrGroups);
+        }, executor);
+
+        CompletableFuture<Void> imagesFuture = CompletableFuture.runAsync(() -> {
+            List<SkuImagesEntity> skuImages = skuImagesService.listBySkuId(skuId);
+            item.setImages(skuImages);
+        }, executor);
+
+        try {
+            CompletableFuture.allOf(descFuture, saleAttrsFuture, attrGroupsFuture, imagesFuture).get();
+        } catch (InterruptedException | ExecutionException ignored) { }
+
+        return item;
+    }
 }

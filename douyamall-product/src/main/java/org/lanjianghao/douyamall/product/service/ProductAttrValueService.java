@@ -3,6 +3,7 @@ package org.lanjianghao.douyamall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.ProductAttrValueEntity;
+import org.lanjianghao.douyamall.product.vo.SkuItemVo;
 
 import java.util.List;
 import java.util.Map;

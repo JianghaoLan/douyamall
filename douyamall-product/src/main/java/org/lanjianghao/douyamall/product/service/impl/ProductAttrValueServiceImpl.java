@@ -1,9 +1,14 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
+import org.lanjianghao.douyamall.product.entity.AttrAttrgroupRelationEntity;
+import org.lanjianghao.douyamall.product.service.AttrAttrgroupRelationService;
+import org.lanjianghao.douyamall.product.vo.SkuItemVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service("productAttrValueService")
 public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao, ProductAttrValueEntity> implements ProductAttrValueService {
+
+    AttrAttrgroupRelationService relationService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -41,4 +48,5 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         attrValues.forEach(attrValue -> attrValue.setSpuId(spuId));
         this.saveBatch(attrValues);
     }
+
 }

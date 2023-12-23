@@ -1,8 +1,12 @@
 package org.lanjianghao.douyamall.product.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.lanjianghao.douyamall.product.entity.AttrGroupEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.lanjianghao.douyamall.product.vo.SpuBaseAttrGroup;
+
+import java.util.List;
 
 /**
  * 属性分组
@@ -13,5 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AttrGroupDao extends BaseMapper<AttrGroupEntity> {
-	
+
+    List<SpuBaseAttrGroup> selectAttrGroupBySpuId(@Param("spuId") Long spuId);
 }

@@ -10,9 +10,11 @@ package org.lanjianghao.common.exception;
  *      001：参数格式校验
  *  11: 商品
  *  12: 库存
- *  13: 订单
- *  14: 购物车
- *  15: 物流
+ *  13: 认证
+ *  14: 会员
+ *  15: 订单
+ *  16: 购物车
+ *  17: 物流
  */
 public enum BizCodeEnum {
     /**
@@ -30,8 +32,19 @@ public enum BizCodeEnum {
      * 12 库存
      */
     INCORRECT_PURCHASE_ITEMS_EXCEPTION(12001, "采购需求有误"),
-    INCORRECT_PURCHASE_STATUS_EXCEPTION(12002, "采购单状态有误")
+    INCORRECT_PURCHASE_STATUS_EXCEPTION(12002, "采购单状态有误"),
 
+    /**
+     * 13 认证
+     */
+    SMS_CODE_SEND_INTERVAL_EXCEPTION(13001, "验证码发送频率太高，请稍后再试"),
+    SMS_SEND_CODE_EXCEPTION(13001, "验证码发送失败，请稍后再试"),
+
+    /**
+     * 14 会员
+     */
+    USERNAME_EXISTS_EXCEPTION(14001, "用户名已存在"),
+    MOBILE_EXISTS_EXCEPTION(14002, "该手机号已经注册")
     ;
 
 

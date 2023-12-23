@@ -2,8 +2,11 @@ package org.lanjianghao.douyamall.product;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
+import org.lanjianghao.douyamall.product.dao.AttrGroupDao;
 import org.lanjianghao.douyamall.product.entity.BrandEntity;
+import org.lanjianghao.douyamall.product.service.AttrGroupService;
 import org.lanjianghao.douyamall.product.service.BrandService;
+import org.lanjianghao.douyamall.product.vo.SpuBaseAttrGroup;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +28,9 @@ class DouyamallProductApplicationTests {
 
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    AttrGroupDao attrGroupDao;
 
     @Test
     void testRedissonClient() {
@@ -54,6 +60,12 @@ class DouyamallProductApplicationTests {
         List<BrandEntity> list = brandService.list(new QueryWrapper<BrandEntity>().eq("brand_id", 1L));
         list.forEach(System.out::println);
 
+    }
+
+    @Test
+    void testListAttrGroupVo() {
+        List<SpuBaseAttrGroup> spuBaseAttrGroups = attrGroupDao.selectAttrGroupBySpuId(13L);
+        System.out.println(spuBaseAttrGroups);
     }
 
 }
