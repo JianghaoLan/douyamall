@@ -21,4 +21,7 @@ import java.util.List;
 public interface SkuSaleAttrValueDao extends BaseMapper<SkuSaleAttrValueEntity> {
 
     List<SkuSaleAttr> selectSaleAttrsBySpuId(@Param("spuId") Long spuId);
+
+    @Select("SELECT CONCAT(attr_name, \"：\", attr_value) FROM `pms_sku_sale_attr_value` WHERE sku_id=#{skuId}")
+    List<String> selectSaleAttrsAsStringListBySkuId(@Param("skuId") Long skuId);
 }

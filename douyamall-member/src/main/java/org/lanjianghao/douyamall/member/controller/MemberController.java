@@ -3,9 +3,11 @@ package org.lanjianghao.douyamall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.lanjianghao.common.exception.BizCodeEnum;
 import org.lanjianghao.douyamall.member.exception.MobileExistsException;
 import org.lanjianghao.douyamall.member.exception.UsernameExistsException;
 import org.lanjianghao.douyamall.member.feign.CouponFeignService;
+import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -98,6 +100,23 @@ public class MemberController {
         memberService.register(vo);
 
         return R.ok();
+    }
+
+    /**
+     * 登录
+     * @param vo
+     * @return
+     */
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginVo vo) {
+        MemberEntity member = memberService.login(vo);
+
+        if (member == null) {
+            return R.error(BizCodeEnum.LOGIN_FAILED_EXCEPTION.getCode(),
+                    BizCodeEnum.LOGIN_FAILED_EXCEPTION.getMessage());
+        }
+
+        return R.ok().put("data", member);
     }
 
 }

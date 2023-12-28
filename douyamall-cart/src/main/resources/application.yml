@@ -1,0 +1,24 @@
+server:
+  port: 30000
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.2.132:8848
+  thymeleaf:
+    cache: false
+  redis:
+    host: 172.16.2.132
+    port: 6379
+  session:
+    store-type: redis
+logging:
+  level:
+    org.lanjianghao: debug
+
+douyamall:
+  thread-pool:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10

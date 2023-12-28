@@ -44,7 +44,14 @@ public enum BizCodeEnum {
      * 14 会员
      */
     USERNAME_EXISTS_EXCEPTION(14001, "用户名已存在"),
-    MOBILE_EXISTS_EXCEPTION(14002, "该手机号已经注册")
+    MOBILE_EXISTS_EXCEPTION(14002, "该手机号已经注册"),
+
+    LOGIN_FAILED_EXCEPTION(14003, "账号或密码错误"),
+
+    /**
+     * 16 购物车
+     */
+    SKU_NOT_EXISTS_EXCEPTION(16001, "购物车不存在此商品")
     ;
 
 

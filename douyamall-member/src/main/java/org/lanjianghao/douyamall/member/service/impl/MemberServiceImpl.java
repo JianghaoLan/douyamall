@@ -3,6 +3,7 @@ package org.lanjianghao.douyamall.member.service.impl;
 import org.lanjianghao.douyamall.member.exception.MobileExistsException;
 import org.lanjianghao.douyamall.member.exception.UsernameExistsException;
 import org.lanjianghao.douyamall.member.service.MemberLevelService;
+import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -64,6 +65,24 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         entity.setPassword(passwordEncoder.encode(vo.getPassword()));
 
         this.save(entity);
+    }
+
+    @Override
+    public MemberEntity login(MemberLoginVo vo) {
+        MemberEntity member = this.getOne(new QueryWrapper<MemberEntity>()
+                .eq("username", vo.getAccount())
+                .or().eq("mobile", vo.getAccount()));
+
+        if (member == null) {
+            return null;
+        }
+        //password
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        boolean matches = passwordEncoder.matches(vo.getPassword(), member.getPassword());
+        if (matches) {
+            return member;
+        }
+        return null;
     }
 
 }

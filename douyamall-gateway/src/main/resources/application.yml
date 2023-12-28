@@ -56,6 +56,11 @@ spring:
           predicates:
             - Host=auth.douyamall.com
 
+        - id: cart_route
+          uri: lb://douyamall-cart
+          predicates:
+            - Host=cart.douyamall.com
+
       globalcors:
         cors-configurations:
           '[/**]':

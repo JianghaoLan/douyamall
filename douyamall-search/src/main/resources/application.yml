@@ -8,7 +8,10 @@ spring:
     name: douyamall-search
   thymeleaf:
     cache: false
-  messages:
-    basename:
+  redis:
+    host: 172.16.2.132
+    port: 6379
+  session:
+    store-type: redis
 server:
   port: 12000

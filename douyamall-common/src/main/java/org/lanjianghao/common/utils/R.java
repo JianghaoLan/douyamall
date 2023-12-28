@@ -23,6 +23,8 @@ import java.util.Map;
 public class R extends HashMap<String, Object> {
 	private static final long serialVersionUID = 1L;
 
+	private static final ObjectMapper mapper = new ObjectMapper();
+
 	public R() {
 		put("code", 0);
 		put("msg", "success");
@@ -73,7 +75,10 @@ public class R extends HashMap<String, Object> {
 	}
 
 	public <T> T get(String key, TypeReference<T> typeReference) {
-		final ObjectMapper mapper = new ObjectMapper();
 		return mapper.convertValue(this.get(key), typeReference);
+	}
+
+	public <T> T get(String key, Class<T> toValueType) {
+		return mapper.convertValue(this.get(key), toValueType);
 	}
 }

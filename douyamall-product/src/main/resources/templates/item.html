@@ -15,7 +15,7 @@
         <!--品牌官方网站-->
         <div class="min">
             <ul class="header_ul_left">
-                <li class="glyphicon glyphicon-home"><a href="/static/item/shouye.html" class="aa">京东首页</a></li>
+                <li class="glyphicon glyphicon-home"><a href="http://douyamall.com" class="aa">豆芽首页</a></li>
                 <li class="glyphicon glyphicon-map-marker"><a href="/static/item/javascript:;">北京</a>
                     <ol id="beijing">
                         <li style="background: red;"><a href="/static/item/javascript:;" style="color: white;">北京</a>
@@ -58,8 +58,14 @@
                 </li>
             </ul>
             <ul class="header_ul_right">
-                <li style="border: 0;"><a href="/static/item/../登录页面\index.html" class="aa">你好，请登录</a></li>
-                <li><a href="/static/item/../注册页面\index.html" style="color: red;">免费注册</a> |</li>
+                <li style="border: 0;">
+                    <a th:if="${session.loginUser != null}">
+                        欢迎您，[[${!#strings.isEmpty(session.loginUser.nickname) ? session.loginUser.nickname : session.loginUser.username}]]
+                    </a>
+                    <a href="http://auth.douyamall.com/login.html" th:if="${session.loginUser == null}">你好，请登录</a>
+<!--                    <a href="/static/item/../登录页面\index.html" class="aa">你好，请登录</a>-->
+                </li>
+                <li><a href="http://auth.douyamall.com/reg.html" th:if="${session.loginUser == null}" style="color: red;">免费注册</a> |</li>
                 <li><a href="/static/item/javascript:;" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="/static/item/javascript:;">我的京东</a><span
                         class="glyphicon glyphicon-menu-down">|</span>
@@ -256,7 +262,7 @@
     <nav>
         <div class="nav_min">
             <div class="nav_top">
-                <div class="nav_top_one"><a href="/static/item/#"><img src="/static/item/img/111.png"/></a></div>
+                <div class="nav_top_one"><a href="http://douyamall.com"><img src="/static/item/img/111.png"/></a></div>
                 <div class="nav_top_two"><input type="text"/>
                     <button>搜索</button>
                 </div>
@@ -621,7 +627,7 @@
 
                 <div class="box-btns clear">
                     <div class="box-btns-one">
-                        <input type="text" name="" id="" value="1"/>
+                        <input type="text" name="" id="numInput" value="1"/>
                         <div class="box-btns-one1">
 
                             <div>
@@ -638,8 +644,8 @@
                         </div>
                     </div>
                     <div class="box-btns-two">
-                        <a href="/static/item/../商品分类\index.html">
-                            立即预约
+                        <a href="#" id="addToCartA" th:attr="skuId=${item.info.skuId}">
+                            加入购物车
                         </a>
                     </div>
                     <div class="box-btns-three">
@@ -1309,7 +1315,12 @@
         }
     })
 
-
+    $("#addToCartA").click(function() {
+        const num = $('#numInput').val();
+        const skuId = $(this).attr("skuId");
+        location.href = "http://cart.douyamall.com/add?skuId=" + skuId + "&num=" + num;
+        return false;
+    })
 </script>
 
 <style>

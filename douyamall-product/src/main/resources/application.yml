@@ -26,6 +26,8 @@ spring:
       cache-null-values: true
       key-prefix: CACHE_
       use-key-prefix: true
+  session:
+    store-type: redis
 
 
 #配置MyBatis-Plus

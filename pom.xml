@@ -22,5 +22,7 @@
         <module>douyamall-gateway</module>
         <module>douyamall-third-party</module>
         <module>douyamall-search</module>
+        <module>douyamall-auth</module>
+        <module>douyamall-cart</module>
     </modules>
 </project>

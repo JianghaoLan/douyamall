@@ -1,25 +1,30 @@
 package org.lanjianghao.douyamall.auth.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.lanjianghao.common.constant.AuthConstant;
 import org.lanjianghao.common.utils.R;
 import org.lanjianghao.douyamall.auth.exception.CodeVerificationFailedException;
 import org.lanjianghao.douyamall.auth.exception.SmsCodeSendIntervalException;
 import org.lanjianghao.douyamall.auth.exception.SmsSendCodeException;
 import org.lanjianghao.douyamall.auth.service.LoginService;
 import org.lanjianghao.douyamall.auth.service.SmsCodeService;
+import org.lanjianghao.douyamall.auth.vo.LoginVo;
+import org.lanjianghao.common.vo.MemberVo;
 import org.lanjianghao.douyamall.auth.vo.RegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 public class LoginController {
 
@@ -84,5 +89,32 @@ public class LoginController {
         }
 
         return "redirect:http://auth.douyamall.com/login.html";
+    }
+
+    @PostMapping("login")
+    public String login(LoginVo vo, RedirectAttributes redirectAttributes, HttpSession session) {
+        R r = loginService.login(vo);
+        if (r.getCode() != 0) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("msg", r.getMsg());
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.douyamall.com/login.html";
+        }
+
+        MemberVo member = r.get("data", MemberVo.class);
+        session.setAttribute(AuthConstant.LOGIN_USER_SESSION_KEY, member);
+        log.debug("登录成功。用户信息：{}", member.toString());
+
+        return "redirect:http://douyamall.com";
+    }
+
+    @RequestMapping("login.html")
+    public String loginPage(HttpSession session) {
+        MemberVo member = (MemberVo) session.getAttribute(AuthConstant.LOGIN_USER_SESSION_KEY);
+        if (member != null) {
+            return "redirect:http://douyamall.com";
+        }
+
+        return "login";
     }
 }
