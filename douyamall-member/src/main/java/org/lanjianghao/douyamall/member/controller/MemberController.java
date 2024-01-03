@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.lanjianghao.common.exception.BizCodeEnum;
-import org.lanjianghao.douyamall.member.exception.MobileExistsException;
-import org.lanjianghao.douyamall.member.exception.UsernameExistsException;
 import org.lanjianghao.douyamall.member.feign.CouponFeignService;
 import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2LoginVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2RegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.member.entity.MemberEntity;
@@ -95,7 +96,7 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    public R register(@RequestBody MemberRegisterVo vo) {
+    public R register(@RequestBody @Validated MemberRegisterVo vo) {
 
         memberService.register(vo);
 
@@ -108,7 +109,7 @@ public class MemberController {
      * @return
      */
     @PostMapping("/login")
-    public R login(@RequestBody MemberLoginVo vo) {
+    public R login(@RequestBody @Validated MemberLoginVo vo) {
         MemberEntity member = memberService.login(vo);
 
         if (member == null) {
@@ -119,4 +120,22 @@ public class MemberController {
         return R.ok().put("data", member);
     }
 
+    @PostMapping("/oauth2/login")
+    public R oAuth2Login(@RequestBody @Validated OAuth2LoginVo vo) {
+        MemberEntity member = memberService.oAuth2Login(vo);
+
+        if (member == null) {
+            return R.error(BizCodeEnum.OAUTH2_USER_NOT_EXISTS_EXCEPTION.getCode(),
+                    BizCodeEnum.OAUTH2_USER_NOT_EXISTS_EXCEPTION.getMessage());
+        }
+
+        return R.ok().put("data", member);
+    }
+
+    @PostMapping("/oauth2/register")
+    public R oAuth2Register(@RequestBody @Validated OAuth2RegisterVo vo) {
+        memberService.oAuth2Register(vo);
+
+        return R.ok();
+    }
 }

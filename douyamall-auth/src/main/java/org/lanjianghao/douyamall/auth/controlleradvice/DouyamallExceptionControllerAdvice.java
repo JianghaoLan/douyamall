@@ -6,6 +6,7 @@ import org.lanjianghao.common.exception.BizCodeEnum;
 import org.lanjianghao.common.utils.R;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -35,6 +36,12 @@ public class DouyamallExceptionControllerAdvice {
     public R handleApplicationException(ApplicationException e) {
         log.error("异常：{}。类型：{}", e.getMessage(), e.getClass().getSimpleName());
         return R.error(e.getCode(), e.getMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public R handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.error("异常：{}。类型：{}", e.getMessage(), e.getClass().getSimpleName());
+        return R.error(e.getMessage());
     }
 
     @ExceptionHandler(Throwable.class)

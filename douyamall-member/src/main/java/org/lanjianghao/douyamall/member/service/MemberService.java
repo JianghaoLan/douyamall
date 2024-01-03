@@ -7,6 +7,8 @@ import org.lanjianghao.douyamall.member.exception.MobileExistsException;
 import org.lanjianghao.douyamall.member.exception.UsernameExistsException;
 import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2LoginVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2RegisterVo;
 
 import java.util.Map;
 
@@ -24,5 +26,9 @@ public interface MemberService extends IService<MemberEntity> {
     void register(MemberRegisterVo vo) throws MobileExistsException, UsernameExistsException;
 
     MemberEntity login(MemberLoginVo vo);
+
+    MemberEntity oAuth2Login(OAuth2LoginVo vo);
+
+    void oAuth2Register(OAuth2RegisterVo vo);
 }
 

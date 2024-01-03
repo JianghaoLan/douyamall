@@ -94,6 +94,11 @@ public class MemberEntity implements Serializable {
 	private Date createTime;
 
 	/**
+	 * 第三方账号所属平台
+	 */
+	private Integer oauth2Platform;
+
+	/**
 	 * 绑定第三方账号uid
 	 */
 	private String socialUid;

@@ -48,6 +48,10 @@ public enum BizCodeEnum {
 
     LOGIN_FAILED_EXCEPTION(14003, "账号或密码错误"),
 
+    OAUTH2_USER_NOT_EXISTS_EXCEPTION(14004, "该第三方用户还未注册"),
+    OAUTH2_LOGIN_FAILED_EXCEPTION(14002, "第三方用户登录失败，请稍后再试"),
+    OAUTH2_REGISTER_FAILED_EXCEPTION(14003, "第三方用户注册失败，请稍后再试"),
+
     /**
      * 16 购物车
      */

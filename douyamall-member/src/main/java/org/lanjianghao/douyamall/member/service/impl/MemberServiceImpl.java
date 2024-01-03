@@ -5,9 +5,14 @@ import org.lanjianghao.douyamall.member.exception.UsernameExistsException;
 import org.lanjianghao.douyamall.member.service.MemberLevelService;
 import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2LoginVo;
+import org.lanjianghao.douyamall.member.vo.OAuth2RegisterVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -59,6 +64,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         entity.setLevelId(memberLevelService.getDefaultLevelId());
         entity.setUsername(vo.getUserName());
         entity.setMobile(vo.getPhone());
+        entity.setCreateTime(new Date());
 
         //password
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -82,6 +88,44 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         if (matches) {
             return member;
         }
+        return null;
+    }
+
+    private MemberEntity getOAuth2MemberByPlatformAndUid(Integer platform, String uid) {
+        return this.baseMapper.selectOne(
+                new QueryWrapper<MemberEntity>()
+                        .eq("oauth2_platform", platform)
+                        .eq("social_uid", uid));
+    }
+
+    @Override
+    public void oAuth2Register(OAuth2RegisterVo vo) {
+        MemberEntity entity = new MemberEntity();
+        BeanUtils.copyProperties(vo, entity);
+
+        entity.setLevelId(memberLevelService.getDefaultLevelId());
+        entity.setCreateTime(new Date());
+
+        this.save(entity);
+    }
+
+    @Override
+    public MemberEntity oAuth2Login(OAuth2LoginVo vo) {
+        MemberEntity member = getOAuth2MemberByPlatformAndUid(vo.getPlatform(), vo.getUid());
+        if (member != null) {
+            //社交账号已经绑定本站账号，更新过期时间
+            MemberEntity update = new MemberEntity();
+            update.setId(member.getId());
+            update.setAccessToken(vo.getAccessToken());
+            update.setExpiresIn(vo.getExpiresIn());
+            this.updateById(update);
+
+            member.setAccessToken(vo.getAccessToken());
+            member.setExpiresIn(vo.getExpiresIn());
+            return member;
+        }
+
+        //该社交账号未绑定账号
         return null;
     }
 
