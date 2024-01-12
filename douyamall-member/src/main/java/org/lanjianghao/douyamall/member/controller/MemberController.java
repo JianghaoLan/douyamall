@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.lanjianghao.common.exception.BizCodeEnum;
+import org.lanjianghao.common.vo.MemberVo;
 import org.lanjianghao.douyamall.member.feign.CouponFeignService;
+import org.lanjianghao.douyamall.member.interceptor.AuthInterceptor;
 import org.lanjianghao.douyamall.member.vo.MemberLoginVo;
 import org.lanjianghao.douyamall.member.vo.MemberRegisterVo;
 import org.lanjianghao.douyamall.member.vo.OAuth2LoginVo;
@@ -137,5 +139,16 @@ public class MemberController {
         memberService.oAuth2Register(vo);
 
         return R.ok();
+    }
+
+    //TODO 未完成
+    @GetMapping("/integration")
+    public R integration() {
+        MemberVo memberVo = AuthInterceptor.loginUser.get();
+        if (memberVo == null || memberVo.getId() == null) {
+            return R.error();
+        }
+        Integer integration = memberService.getIntegration(memberVo.getId());
+        return R.ok().put("data", integration);
     }
 }

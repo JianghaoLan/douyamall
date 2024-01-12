@@ -1,6 +1,9 @@
 package org.lanjianghao.douyamall.ware.service.impl;
 
+import org.lanjianghao.common.constant.WareConstant;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +27,13 @@ public class WareOrderTaskDetailServiceImpl extends ServiceImpl<WareOrderTaskDet
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<WareOrderTaskDetailEntity> listLockedEntitiesByTaskId(Long taskId) {
+        return this.list(new QueryWrapper<WareOrderTaskDetailEntity>()
+                .eq("task_id", taskId)
+                .eq("lock_status", WareConstant.OrderTaskLockStatusEnum.LOCKED.getCode()));
     }
 
 }

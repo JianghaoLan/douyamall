@@ -33,6 +33,8 @@ public enum BizCodeEnum {
      */
     INCORRECT_PURCHASE_ITEMS_EXCEPTION(12001, "采购需求有误"),
     INCORRECT_PURCHASE_STATUS_EXCEPTION(12002, "采购单状态有误"),
+    GET_FARE_ERROR_EXCEPTION(12003, "运费查询失败"),
+    NO_ENOUGH_STOCK_EXCEPTION(12004, "库存锁定失败"),
 
     /**
      * 13 认证
@@ -51,6 +53,13 @@ public enum BizCodeEnum {
     OAUTH2_USER_NOT_EXISTS_EXCEPTION(14004, "该第三方用户还未注册"),
     OAUTH2_LOGIN_FAILED_EXCEPTION(14002, "第三方用户登录失败，请稍后再试"),
     OAUTH2_REGISTER_FAILED_EXCEPTION(14003, "第三方用户注册失败，请稍后再试"),
+
+    /**
+     * 15 订单
+     */
+    ORDER_TOKEN_VERIFY_FAILED_EXCEPTION(15001, "订单Token验证失败"),
+    ORDER_CREATE_FAILED_EXCEPTION(15002, "订单创建失败"),
+    ORDER_PRICE_CHECK_FAILED_EXCEPTION(15003, "订单验价失败"),
 
     /**
      * 16 购物车

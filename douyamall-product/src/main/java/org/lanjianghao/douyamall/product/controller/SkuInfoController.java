@@ -1,14 +1,13 @@
 package org.lanjianghao.douyamall.product.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.douyamall.product.vo.SkuPriceVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.product.entity.SkuInfoEntity;
 import org.lanjianghao.douyamall.product.service.SkuInfoService;
@@ -81,4 +80,14 @@ public class SkuInfoController {
         return R.ok();
     }
 
+//    @GetMapping("/price/{skuId}")
+//    public R price(@PathVariable("skuId") Long skuId) {
+//        BigDecimal price = skuInfoService.getPriceBySkuId();
+//    }
+
+    @PostMapping("/prices")
+    public R prices(@RequestBody List<Long> skuIds) {
+        List<SkuPriceVo> prices = skuInfoService.listPricesBySkuIds(skuIds);
+        return R.ok().put("data", prices);
+    }
 }

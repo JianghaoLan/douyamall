@@ -1,7 +1,6 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.lanjianghao.common.constant.ProductConstant;
 import org.lanjianghao.common.to.*;
 import org.lanjianghao.common.utils.R;
@@ -10,6 +9,7 @@ import org.lanjianghao.douyamall.product.feign.CouponFeignService;
 import org.lanjianghao.douyamall.product.feign.SearchFeignService;
 import org.lanjianghao.douyamall.product.feign.WareFeignService;
 import org.lanjianghao.douyamall.product.service.*;
+import org.lanjianghao.douyamall.product.to.SkuSpuIdTo;
 import org.lanjianghao.douyamall.product.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +27,7 @@ import org.lanjianghao.common.utils.Query;
 
 import org.lanjianghao.douyamall.product.dao.SpuInfoDao;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -333,5 +334,34 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         } else {
             //TODO 失败重复调用/接口幂等性/重试机制
         }
+    }
+
+//    @Override
+//    public SpuInfoEntity getBySkuId(Long skuId) {
+//        Long spuId = skuInfoService.getSpuIdBySkuId(skuId);
+//        return this.getOne(new QueryWrapper<SpuInfoEntity>().eq("id", spuId));
+//    }
+
+    @Override
+    public List<GetSpuInfoBySkuIdVo> getSpuInfosBySkuIds(List<Long> skuIds) {
+        if (CollectionUtils.isEmpty(skuIds)) {
+            return null;
+        }
+        List<SkuSpuIdTo> skuSpuIds = skuInfoService.getSpuIdsBySkuIds(skuIds);
+
+        Map<Long, Long> spuIdLookupTable = skuSpuIds.stream().collect(
+                Collectors.toMap(SkuSpuIdTo::getSkuId, SkuSpuIdTo::getSpuId));
+
+        Set<Long> spuIds = skuSpuIds.stream().map(SkuSpuIdTo::getSpuId).collect(Collectors.toSet());
+        List<SpuInfoEntity> spuInfos = this.listByIds(spuIds);
+        Map<Long, SpuInfoEntity> spuInfoLookupTable = spuInfos.stream().collect(
+                Collectors.toMap(SpuInfoEntity::getId, ent -> ent));
+
+        return skuIds.stream().map(skuId -> {
+            GetSpuInfoBySkuIdVo vo = new GetSpuInfoBySkuIdVo();
+            vo.setSpuInfo(spuInfoLookupTable.get(spuIdLookupTable.get(skuId)));
+            vo.setSkuId(skuId);
+            return vo;
+        }).collect(Collectors.toList());
     }
 }

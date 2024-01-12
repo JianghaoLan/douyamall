@@ -34,6 +34,9 @@ public class CartVo {
         BigDecimal totalPrice = new BigDecimal(0);
         if (items != null) {
             for (CartItemVo item : items) {
+                if (!item.getChecked()) {
+                    continue;
+                }
                 totalPrice = totalPrice.add(item.getTotalPrice());
             }
         }

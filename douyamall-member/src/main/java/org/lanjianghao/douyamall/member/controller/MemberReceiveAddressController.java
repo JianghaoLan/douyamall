@@ -1,14 +1,13 @@
 package org.lanjianghao.douyamall.member.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.vo.MemberVo;
+import org.lanjianghao.douyamall.member.interceptor.AuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.member.entity.MemberReceiveAddressEntity;
 import org.lanjianghao.douyamall.member.service.MemberReceiveAddressService;
@@ -81,4 +80,18 @@ public class MemberReceiveAddressController {
         return R.ok();
     }
 
+//    @GetMapping("/list/{memberId}")
+//    public List<MemberReceiveAddressEntity> listByMember(@PathVariable("memberId") Long memberId) {
+//        return memberReceiveAddressService.listByMemberId(memberId);
+//    }
+
+    @GetMapping("/list")
+    public List<MemberReceiveAddressEntity> list() {
+        MemberVo memberVo = AuthInterceptor.loginUser.get();
+        if (memberVo == null || memberVo.getId() == null) {
+            return null;
+        }
+
+        return memberReceiveAddressService.listByMemberId(memberVo.getId());
+    }
 }

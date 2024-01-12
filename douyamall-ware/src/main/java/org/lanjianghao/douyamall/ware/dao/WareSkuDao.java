@@ -2,6 +2,7 @@ package org.lanjianghao.douyamall.ware.dao;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.lanjianghao.douyamall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +26,15 @@ public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
     long selectUnlockedStockBySkuId(@Param("skuId") Long skuId);
 
     List<SkuStockVo> selectUnlockedStocksBySkuIds(@Param("skuIds") List<Long> skuIds);
+
+    @Select("SELECT `ware_id` FROM `wms_ware_sku` WHERE `sku_id` = #{skuId} AND `stock` - `stock_locked` >= #{num}")
+    List<Long> listWareHasEnoughStock(@Param("skuId") Long skuId, @Param("num") Integer num);
+
+    @Update("UPDATE `wms_ware_sku` SET `stock_locked` = `stock_locked` + #{num} " +
+            "WHERE `sku_id` = #{skuId} AND `ware_id` = #{wareId} AND `stock` - `stock_locked` >= #{num}")
+    Long lockStock(@Param("skuId") Long skuId, @Param("wareId") Long wareId, @Param("num") Integer num);
+
+    @Update("UPDATE `wms_ware_sku` SET `stock_locked` = `stock_locked` - #{skuNum} " +
+            "WHERE `sku_id` = #{skuId} AND `ware_id` = #{wareId}")
+    Integer unlockStock(@Param("skuId") Long skuId, @Param("wareId") Long wareId, @Param("skuNum") Integer skuNum);
 }

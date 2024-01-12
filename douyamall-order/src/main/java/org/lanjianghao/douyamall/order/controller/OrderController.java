@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.order.entity.OrderEntity;
 import org.lanjianghao.douyamall.order.service.OrderService;
@@ -29,6 +25,15 @@ import org.lanjianghao.common.utils.R;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    /**
+     * 获取订单状态信息
+     */
+    @GetMapping("/ordersn/{orderSn}/status")
+    public R getOrderStatusByOrderSn(@PathVariable("orderSn") String orderSn) {
+        Integer status = orderService.getOrderStatusByOrderSn(orderSn);
+        return R.ok().put("data", status);
+    }
 
     /**
      * 列表

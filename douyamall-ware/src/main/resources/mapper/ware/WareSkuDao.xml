@@ -20,7 +20,7 @@
     </update>
 
     <select id="selectUnlockedStocksBySkuIds" resultType="org.lanjianghao.douyamall.ware.vo.SkuStockVo">
-        SELECT sku_id, COUNT(stock - stock_locked) as stock
+        SELECT sku_id, SUM(stock - stock_locked) as stock
         FROM `wms_ware_sku`
         <where>
             <foreach item="skuId" collection="skuIds" open="sku_id in (" separator="," close=")">

@@ -30,5 +30,7 @@ public interface MemberService extends IService<MemberEntity> {
     MemberEntity oAuth2Login(OAuth2LoginVo vo);
 
     void oAuth2Register(OAuth2RegisterVo vo);
+
+    Integer getIntegration(Long id);
 }
 

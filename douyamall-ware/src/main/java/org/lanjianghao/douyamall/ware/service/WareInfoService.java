@@ -3,6 +3,7 @@ package org.lanjianghao.douyamall.ware.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.ware.entity.WareInfoEntity;
+import org.lanjianghao.douyamall.ware.vo.FareVo;
 
 import java.util.Map;
 
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface WareInfoService extends IService<WareInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    FareVo getFareByAddrId(Long addrId);
 }
 

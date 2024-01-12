@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.lanjianghao.common.to.SkuHasStockTo;
+import org.lanjianghao.douyamall.ware.exception.NoEnoughStockException;
+import org.lanjianghao.douyamall.ware.vo.LockStockResultVo;
+import org.lanjianghao.douyamall.ware.vo.WareSkuLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,19 @@ import org.lanjianghao.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    /**
+     * 锁定库存
+     */
+    @PostMapping("/lock/order")
+    public R lockStockForOrder(@RequestBody WareSkuLockVo wareSkuLockVo) {
+        try {
+            List<LockStockResultVo> results = wareSkuService.lockStockForOrder(wareSkuLockVo);
+            return R.ok().put("data", results);
+        } catch (NoEnoughStockException e) {
+            return R.error(e.getCode(), e.getMessage());
+        }
+    }
 
     /**
      * 列表

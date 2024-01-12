@@ -1,14 +1,12 @@
 package org.lanjianghao.douyamall.ware.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.lanjianghao.douyamall.ware.vo.FareVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.lanjianghao.douyamall.ware.entity.WareInfoEntity;
 import org.lanjianghao.douyamall.ware.service.WareInfoService;
@@ -29,6 +27,13 @@ import org.lanjianghao.common.utils.R;
 public class WareInfoController {
     @Autowired
     private WareInfoService wareInfoService;
+
+    @GetMapping("/fare")
+    public R getFare(@RequestParam("addrId") Long addrId) {
+        FareVo fareVo = wareInfoService.getFareByAddrId(addrId);
+
+        return R.ok().put("data", fareVo);
+    }
 
     /**
      * 列表

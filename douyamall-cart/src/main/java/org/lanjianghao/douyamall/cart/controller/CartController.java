@@ -1,6 +1,5 @@
 package org.lanjianghao.douyamall.cart.controller;
 
-import org.lanjianghao.common.constant.AuthConstant;
 import org.lanjianghao.douyamall.cart.interceptor.CartInterceptor;
 import org.lanjianghao.douyamall.cart.service.CartService;
 import org.lanjianghao.douyamall.cart.to.UserInfoTo;
@@ -11,9 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class CartController {
@@ -77,5 +77,15 @@ public class CartController {
         UserInfoTo userInfo = CartInterceptor.threadLocal.get();
         cartService.deleteItem(userInfo, skuId);
         return "redirect:http://cart.douyamall.com/cart.html";
+    }
+
+    @GetMapping("/list/checked")
+    @ResponseBody
+    public List<CartItemVo> listUserCartCheckedItems() {
+        UserInfoTo userInfo = CartInterceptor.threadLocal.get();
+        if (userInfo.getUserId() == null) {
+            return null;
+        }
+        return cartService.getCartCheckedItems(userInfo);
     }
 }

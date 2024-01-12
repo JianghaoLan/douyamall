@@ -17,6 +17,23 @@
         <result property="price" column="price"/>
         <result property="saleCount" column="sale_count"/>
     </resultMap>
+    <select id="selectPricesBySkuIds" resultType="org.lanjianghao.douyamall.product.vo.SkuPriceVo">
+        SELECT `sku_id`, `price` FROM `pms_sku_info`
+        <where>
+            <foreach item="skuId" collection="skuIds"
+                     open="sku_id in (" separator="," close=")" >
+                #{skuId}
+            </foreach>
+        </where>
+    </select>
+    <select id="getSpuIdsBySkuIds" resultType="org.lanjianghao.douyamall.product.to.SkuSpuIdTo">
+        SELECT `sku_id`, `spu_id` FROM `pms_sku_info`
+        <where>
+            <foreach collection="skuIds" item="skuId" open="sku_id in (" separator="," close=")" >
+                #{skuId}
+            </foreach>
+        </where>
+    </select>
 
 
 </mapper>

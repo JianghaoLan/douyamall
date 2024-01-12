@@ -12,6 +12,11 @@ spring:
         server-addr: 172.16.2.132:8848
   application:
     name: douyamall-member
+  redis:
+    host: 172.16.2.132
+    port: 6379
+  session:
+    store-type: redis
 
 #配置MyBatis-Plus
 #主类上添加MapperScan
@@ -23,3 +28,7 @@ mybatis-plus:
 
 server:
   port: 8000
+
+logging:
+  level:
+    org.lanjianghao.douyamall: debug

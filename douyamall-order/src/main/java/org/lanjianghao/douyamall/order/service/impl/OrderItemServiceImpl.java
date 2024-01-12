@@ -1,5 +1,8 @@
 package org.lanjianghao.douyamall.order.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.lanjianghao.douyamall.order.entity.OrderEntity;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,6 +16,7 @@ import org.lanjianghao.douyamall.order.entity.OrderItemEntity;
 import org.lanjianghao.douyamall.order.service.OrderItemService;
 
 
+@Slf4j
 @Service("orderItemService")
 public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEntity> implements OrderItemService {
 
@@ -25,5 +29,4 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
 
         return new PageUtils(page);
     }
-
 }

@@ -110,6 +110,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     }
 
     @Override
+    public Integer getIntegration(Long id) {
+        return this.baseMapper.selectIntegrationById(id);
+    }
+
+    @Override
     public MemberEntity oAuth2Login(OAuth2LoginVo vo) {
         MemberEntity member = getOAuth2MemberByPlatformAndUid(vo.getPlatform(), vo.getUid());
         if (member != null) {

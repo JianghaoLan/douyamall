@@ -1,8 +1,10 @@
 package org.lanjianghao.douyamall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.douyamall.product.vo.GetSpuInfoBySkuIdVo;
 import org.lanjianghao.douyamall.product.vo.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -87,5 +89,17 @@ public class SpuInfoController {
     public R upSpu(@PathVariable("spuId") Long spuId) {
         spuInfoService.upSpu(spuId);
         return R.ok();
+    }
+
+//    @GetMapping("/byskuId/{skuId}")
+//    public R getSpuInfoBySkuId(@PathVariable("skuId") Long skuId) {
+//        SpuInfoEntity spuInfo = spuInfoService.getBySkuId(skuId);
+//        return R.ok().put("data", spuInfo);
+//    }
+
+    @PostMapping("/byskuids")
+    public R getSpuInfosBySkuIds(@RequestBody List<Long> skuIds) {
+        List<GetSpuInfoBySkuIdVo> vos = spuInfoService.getSpuInfosBySkuIds(skuIds);
+        return R.ok().put("data", vos);
     }
 }

@@ -2,9 +2,8 @@ package org.lanjianghao.douyamall.product.service.impl;
 
 import org.lanjianghao.douyamall.product.entity.*;
 import org.lanjianghao.douyamall.product.service.*;
-import org.lanjianghao.douyamall.product.vo.SkuItemVo;
-import org.lanjianghao.douyamall.product.vo.SkuSaleAttr;
-import org.lanjianghao.douyamall.product.vo.SpuBaseAttrGroup;
+import org.lanjianghao.douyamall.product.to.SkuSpuIdTo;
+import org.lanjianghao.douyamall.product.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,7 @@ import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.common.utils.Query;
 
 import org.lanjianghao.douyamall.product.dao.SkuInfoDao;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
@@ -146,5 +146,23 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         } catch (InterruptedException | ExecutionException ignored) { }
 
         return item;
+    }
+
+    @Override
+    public List<SkuPriceVo> listPricesBySkuIds(List<Long> skuIds) {
+        return this.baseMapper.selectPricesBySkuIds(skuIds);
+    }
+
+//    @Override
+//    public Long getSpuIdBySkuId(Long skuId) {
+//        return this.baseMapper.getSpuIdBySkuId(skuId);
+//    }
+
+    @Override
+    public List<SkuSpuIdTo> getSpuIdsBySkuIds(List<Long> skuIds) {
+        if (CollectionUtils.isEmpty(skuIds)) {
+            return null;
+        }
+        return this.baseMapper.getSpuIdsBySkuIds(skuIds);
     }
 }

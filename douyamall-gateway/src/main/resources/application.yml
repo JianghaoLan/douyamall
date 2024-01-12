@@ -61,6 +61,11 @@ spring:
           predicates:
             - Host=cart.douyamall.com
 
+        - id: order_route
+          uri: lb://douyamall-order
+          predicates:
+            - Host=order.douyamall.com
+
       globalcors:
         cors-configurations:
           '[/**]':

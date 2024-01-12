@@ -1,5 +1,6 @@
 package org.lanjianghao.douyamall.cart.interceptor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.lanjianghao.common.constant.AuthConstant;
@@ -21,15 +22,18 @@ import java.util.UUID;
  * 判断用户登录状态，并封装传递给Controller
  */
 @Component
+@Slf4j
 public class CartInterceptor implements HandlerInterceptor {
 
     public static ThreadLocal<UserInfoTo> threadLocal = new ThreadLocal<>();
 
     private String getTempUserKey(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(CartConstant.TEMP_USER_COOKIE_NAME)) {
-                return cookie.getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(CartConstant.TEMP_USER_COOKIE_NAME)) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;
@@ -49,6 +53,8 @@ public class CartInterceptor implements HandlerInterceptor {
         MemberVo member = (MemberVo) session.getAttribute(AuthConstant.LOGIN_USER_SESSION_KEY);
         if (member != null) {
             userInfo.setUserId(member.getId());
+        } else {
+            log.debug("用户未登录");
         }
 
         String userKey = getTempUserKey(request);

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.lanjianghao.common.utils.PageUtils;
 import org.lanjianghao.douyamall.product.entity.SkuInfoEntity;
 import org.lanjianghao.douyamall.product.vo.SkuItemVo;
+import org.lanjianghao.douyamall.product.vo.SkuPriceVo;
+import org.lanjianghao.douyamall.product.to.SkuSpuIdTo;
 
 import java.util.List;
 import java.util.Map;
@@ -24,5 +26,11 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
     List<SkuInfoEntity> getSkusBySpuId(Long spuId);
 
     SkuItemVo getItem(Long skuId);
+
+    List<SkuPriceVo> listPricesBySkuIds(List<Long> skuIds);
+
+//    Long getSpuIdBySkuId(Long skuId);
+
+    List<SkuSpuIdTo> getSpuIdsBySkuIds(List<Long> skuIds);
 }
 

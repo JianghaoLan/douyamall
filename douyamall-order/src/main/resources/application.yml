@@ -4,14 +4,28 @@ spring:
   datasource:
     username: root
     password: root
-    url: jdbc:mysql://192.168.56.10:3306/douyamall_oms
+    url: jdbc:mysql://172.16.2.132:3306/douyamall_oms
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: 172.16.2.132:8848
   application:
     name: douyamall-order
+  redis:
+    host: 172.16.2.132
+    port: 6379
+  rabbitmq:
+    host: 172.16.2.132
+    port: 5672
+    username: guest
+    password: guest
+  thymeleaf:
+    cache: false
+  session:
+    store-type: redis
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 
 #配置MyBatis-Plus
 #主类上添加MapperScan
@@ -23,3 +37,13 @@ mybatis-plus:
 
 server:
   port: 9000
+
+douyamall:
+  thread-pool:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10
+
+logging:
+  level:
+    org.lanjianghao.douyamall: debug
