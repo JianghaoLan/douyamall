@@ -15,14 +15,15 @@ public class DouyamallOrderWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/list.html").setViewName("list");
-        registry.addViewController("/confirm.html").setViewName("confirm");
-        registry.addViewController("/detail.html").setViewName("detail");
-        registry.addViewController("/pay.html").setViewName("pay");
+//        registry.addViewController("/list.html").setViewName("list");
+//        registry.addViewController("/confirm.html").setViewName("confirm");
+//        registry.addViewController("/detail.html").setViewName("detail");
+//        registry.addViewController("/pay.html").setViewName("pay");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(authInterceptor).addPathPatterns("/**")
+                .excludePathPatterns("/order/order/ordersn/*/status", "/paid/**");
     }
 }

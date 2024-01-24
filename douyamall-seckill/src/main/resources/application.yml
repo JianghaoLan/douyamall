@@ -1,0 +1,73 @@
+#配置数据源
+#应先导入数据库依赖
+spring:
+#  datasource:
+#    username: root
+#    password: root
+#    url: jdbc:mysql://172.16.2.132:3306/douyamall_oms
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.16.2.132:8848
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
+  redis:
+    host: 172.16.2.132
+    port: 6379
+  rabbitmq:
+    host: 172.16.2.132
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual    #手动确认模式
+  thymeleaf:
+    cache: false
+  session:
+    store-type: redis
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  task:
+    execution:
+      pool:
+        core-size: 20
+        max-size: 200
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+
+feign:
+  sentinel:
+    enabled: true
+
+#  task:
+#    scheduling:
+#      pool:
+#        size: 5
+
+#配置MyBatis-Plus
+#主类上添加MapperScan
+#mybatis-plus:
+#  mapper-locations: classpath:/mapper/**/*.xml
+#  global-config:
+#    db-config:
+#      id-type: auto   #自增主键
+
+#douyamall:
+#  thread-pool:
+#    core-size: 20
+#    max-size: 200
+#    keep-alive-time: 10
+
+logging:
+  level:
+    org.lanjianghao.douyamall: debug

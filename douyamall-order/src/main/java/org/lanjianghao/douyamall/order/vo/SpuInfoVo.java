@@ -17,14 +17,12 @@ import java.util.Date;
  * @date 2023-04-12 15:43:09
  */
 @Data
-@TableName("pms_spu_info")
 public class SpuInfoVo implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 商品id
 	 */
-	@TableId
 	private Long id;
 	/**
 	 * 商品名称

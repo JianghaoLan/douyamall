@@ -18,10 +18,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (new AntPathMatcher().match("/order/order/ordersn/*/status", request.getRequestURI())) {
-            return true;
-        }
-
         HttpSession session = request.getSession();
 
         MemberVo loginUser = (MemberVo)session.getAttribute(AuthConstant.LOGIN_USER_SESSION_KEY);

@@ -23,4 +23,6 @@ public class SkuItemVo {
 
     List<SpuBaseAttrGroup> attrGroups;
 
+    SecKillSkuVo secKillInfo;
+
 }

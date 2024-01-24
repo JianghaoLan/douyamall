@@ -11,6 +11,10 @@ spring:
     nacos:
       discovery:
         server-addr: 172.16.2.132:8848
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
@@ -28,7 +32,16 @@ spring:
       use-key-prefix: true
   session:
     store-type: redis
-
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+#    session:
+#      enabled: false
 
 #配置MyBatis-Plus
 #主类上添加MapperScan
@@ -54,3 +67,6 @@ douyamall:
     core-size: 20
     max-size: 200
     keep-alive-time: 10
+feign:
+  sentinel:
+    enabled: true

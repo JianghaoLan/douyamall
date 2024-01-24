@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.lanjianghao.douyamall.order.entity.OrderEntity;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,4 +31,15 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemDao, OrderItemEnt
 
         return new PageUtils(page);
     }
+
+    @Override
+    public OrderItemEntity getOneByOrderSn(String orderSn) {
+        return this.getOne(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+    }
+
+    @Override
+    public List<OrderItemEntity> listByOrderSn(String orderSn) {
+        return this.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+    }
+
 }

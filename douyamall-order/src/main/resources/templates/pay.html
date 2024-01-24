@@ -109,7 +109,10 @@
             <img src="/static/order/pay/img/weixin.png" alt="">微信支付
           </li>
 		  <li>
-            <img src="/static/order/pay/img/zhifubao.png" style="weight:auto;height:30px;" alt="">支付宝
+            <a th:href="'http://order.douyamall.com/pay/alipay?orderSn=' + ${order.orderSn}">
+              <img src="/static/order/pay/img/zhifubao.png" style="weight:auto;height:30px;" alt="">支付宝
+            </a>
+
           </li>
         </ul>
       </div>

@@ -4,6 +4,10 @@ spring:
     nacos:
       discovery:
         server-addr: 172.16.2.132:8848
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
   application:
     name: douyamall-search
   thymeleaf:
@@ -13,5 +17,16 @@ spring:
     port: 6379
   session:
     store-type: redis
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
 server:
   port: 12000
+feign:
+  sentinel:
+    enabled: true

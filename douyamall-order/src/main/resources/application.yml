@@ -10,6 +10,10 @@ spring:
     nacos:
       discovery:
         server-addr: 172.16.2.132:8848
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
   application:
     name: douyamall-order
   redis:
@@ -20,12 +24,26 @@ spring:
     port: 5672
     username: guest
     password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual    #手动确认模式
   thymeleaf:
     cache: false
   session:
     store-type: redis
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+feign:
+  sentinel:
+    enabled: true
 
 #配置MyBatis-Plus
 #主类上添加MapperScan
@@ -47,3 +65,10 @@ douyamall:
 logging:
   level:
     org.lanjianghao.douyamall: debug
+alipay:
+  appId: 9021000133694840
+  merchant-private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQChlIvqC/qRn+op1HKimEn+aieYwDUzrUdeYqo5c18qz04HdRdgW7qHq3dXiOU+xKsVMclyS3ZBGsceAJHrBf775q7XAP/YqQpszDXPDqDpls0IICjY+8FjfPro+NvOMN2LFQ8GELUgJOJh16eBJzksVfQ6wJ9zG4U7y++csYQRvDx1JbyhPtcJNudtFSpTBEvnAxhJZFOBh7frfqaPwUMT4LXnzI45RFTTH490mvZ9QJik9QzG597UiqkRXVbRc+Olb7b2QINw1W2iG/suF2C9EkSQElNZicvyg+sPBr7kGOd4uFbinktcBqqnkE7/2uT818dIsUk3W0yptQ0150adAgMBAAECggEAZ7mrY9DSxp8ovDeUa4plnbvZtXZV8NmgwheGfSDyC9JOnfztx7667JMHJptLxtKLnSx7zDJjNIITJtBo273apSy+Oml61EQX3CXvuP8ED0/uSPQUJM7go5Q8okf3GtNFtR4MqfEZxQvIg9Tjw8ZBLpPzF7BF66fUDMHrDOTsClGNoR2eaXE63W7fM/XUIul9XzF9HW4HWmw8c7CeYl2ClB9mQrtO1shCcvz6YPeK+qZy4zBypbykvExYaa/4nyxyMYRmRwINkOwwjxn6yAL3RjD9h1WOjbnjlfh44JfJnS0NVYlu6nk+iQ9ynhbhANWFybrflnn/01qDbAK+eDogpQKBgQDaAN4/6KvHWvfNMjGFAAcj84lE2FeesHhKxEOJGpAA2ye8NeVkxzq6SV2jtDsffnd32PowGKbgCapQGHqS69hcj/+Us+K6/e1bL06Q9tzD4wQOitVjhgos7/jBwVlse82HZ+5yMU/rvcSCSTjp+Io8SQbwhDRMUJyB3f4lkthvEwKBgQC9vh/s+111ANO0jTAiD6lC16gFYZx6Dr70ItyK1CxOTWx3iXoon5ndQhL9DSLysujoEzhy5hTgYub87MldYHM7G3VhW5MESdWn9DUxyLD2mQe1OXJHN23SHLoPGeoVwLkVdeKssX/4zhSFw192dSa998APj/WYi9JmNVR4w2I5jwKBgQCV0mLrqQvlRi9nZkeCEDLYElcUaVpORRlmyNthLlApRnRYdPHiAMnrnOAt0X+QdWnFg+jthQOqlPnncetLbaqUcqJDoB0CReEJ+ckU95NhTHNNSzy72TLFD2b2QdsjIzJtDJBjCmDSsuiKYagrpBPcupN6WGFY0U2+MsKnL/Ru4QKBgFNWm40qBq1qVJIb5UVAnbZXJFxguCrAKUzvtvBfKqqlxPtn7bjECP+uksqEp5Hz1OqB7qxAtHCt4Ai9M+CIiXQvpknBv/wFNguT7n1USa22HzWQ6smu5dSAe5RAbJlrUZ/EbHAvcibk1Qy/eEF+SSrtE3WCZHvBBgOQbu6v2oevAoGBAMzcPnv5xa2lS6T8+To3pAujWwHvsc9ldfRjWLFViwAmk9cEqGMYFXY8ujmdAozaXRdCjZppGcGWcN2uGudVdaQ4Xezk1Dl/qJVO29ug7ug0CohHfOuL6juODBQlpmHgyP0GjkQla6rzHYt5+Jc+MKQDEcsqP22DUIeWLOdDBh6y
+  alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqehhb7HvmU8z5rQ5XkH6C+j+6Qs5lLrbZNhMgAkssuHgS4kcl41pUk+CTd9Au6C7NW9y6nlVFbhIxWEjdrdRE4VkDyBWNkyK4gCI+F4FgpzbgW4ofUXXVFabs9oa09mlSo919pdrWXiV950FVu5llmZ2WnFductWVap31hMCKpzegweJQIpTXmLS8bj+a7aAEPFv4/WrK+50TFk3WUjoaL8YkCqQYHPGCgGdZkD/40RGYgZlftnuSmuN9UHgH7adavmCKBWkU2HshTnThpO19icc0VoBsr6cIfdzYdZ0xZVxC9oTqDklMzIyszGsyaiUht0szH0csFecqJF1S22L+QIDAQAB
+#  return-url:
+#  notify-url:
+  gateway-url: "https://openapi-sandbox.dl.alipaydev.com/gateway.do"

@@ -134,9 +134,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             return result;
         }
 
-
         RLock lock = redisson.getLock("indexCatalogLock");
-
         lock.lock();
         try {
             try {

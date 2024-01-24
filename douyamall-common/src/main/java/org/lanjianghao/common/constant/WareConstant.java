@@ -2,7 +2,7 @@ package org.lanjianghao.common.constant;
 
 public class WareConstant {
 
-    public final static int STOCK_RELEASE_DELAY = 60000;     //ms
+    public final static int STOCK_RELEASE_DELAY = 60000 * 35;     //ms
 
     public final static String MQ_STOCK_EVENT_EXCHANGE_NAME = "stock-event-exchange";
     public final static String MQ_STOCK_RELEASE_STOCK_QUEUE_NAME = "stock.release.stock.queue";

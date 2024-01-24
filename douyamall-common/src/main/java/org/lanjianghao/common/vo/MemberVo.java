@@ -14,8 +14,7 @@ import java.util.Date;
  */
 @ToString
 @Data
-public class MemberVo implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class MemberVo {
 
 	/**
 	 * id

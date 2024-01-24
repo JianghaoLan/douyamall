@@ -1,8 +1,12 @@
 package org.lanjianghao.douyamall.order.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import org.lanjianghao.common.vo.MemberVo;
+import org.lanjianghao.douyamall.order.interceptor.AuthInterceptor;
+import org.lanjianghao.douyamall.order.vo.MemberOrderVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,4 +90,11 @@ public class OrderController {
         return R.ok();
     }
 
+    @PostMapping("/list/memberOrders")
+    public R listMemberOrders(@RequestBody Map<String, Object> params) {
+        MemberVo memberVo = AuthInterceptor.loginUser.get();
+        PageUtils page = orderService.queryMemberOrdersPage(memberVo.getId(), params);
+
+        return R.ok().put("page", page);
+    }
 }

@@ -1,33 +1,38 @@
 package org.lanjianghao.douyamall.order.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.lanjianghao.common.to.CreateSecKillOrderTo;
 import org.lanjianghao.common.to.OrderTo;
 import org.lanjianghao.common.to.SkuHasStockTo;
 import org.lanjianghao.common.utils.R;
 import org.lanjianghao.common.vo.MemberVo;
+import org.lanjianghao.douyamall.order.component.AlipayTemplate;
 import org.lanjianghao.douyamall.order.constant.OrderConstant;
 import org.lanjianghao.douyamall.order.entity.OrderItemEntity;
+import org.lanjianghao.douyamall.order.entity.PaymentInfoEntity;
+import org.lanjianghao.douyamall.order.enume.AlipayTradeStatusEnum;
 import org.lanjianghao.douyamall.order.enume.OrderStatusEnum;
-import org.lanjianghao.douyamall.order.exception.NoSelectedItemException;
-import org.lanjianghao.douyamall.order.exception.OrderPriceCheckFailedException;
-import org.lanjianghao.douyamall.order.exception.OrderTokenVerifyFailedException;
-import org.lanjianghao.douyamall.order.exception.StockLockFailedException;
+import org.lanjianghao.douyamall.order.exception.*;
 import org.lanjianghao.douyamall.order.feign.CartFeignService;
 import org.lanjianghao.douyamall.order.feign.MemberFeignService;
 import org.lanjianghao.douyamall.order.feign.ProductFeignService;
 import org.lanjianghao.douyamall.order.feign.WareFeignService;
 import org.lanjianghao.douyamall.order.service.OrderItemService;
+import org.lanjianghao.douyamall.order.service.PaymentInfoService;
 import org.lanjianghao.douyamall.order.to.CreateOrderTo;
 import org.lanjianghao.douyamall.order.vo.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -77,6 +82,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private PaymentInfoService paymentInfoService;
+
+    @Autowired
+    private AlipayTemplate alipayTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -131,10 +142,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     orderConfirmVo.setAddresses(memberFeignService.listUserReceiveAddresses());
                 }, executor);
         CompletableFuture<Void> getItemsFuture = CompletableFuture.runAsync(
-                () -> {
+                        () -> {
 //                    RequestContextHolder.setRequestAttributes(requestAttributes);
-                    orderConfirmVo.setItems(cartFeignService.listUserCartCheckedItems());
-                }, executor)
+                            orderConfirmVo.setItems(cartFeignService.listUserCartCheckedItems());
+                        }, executor)
                 .thenRun(() -> {
                     if (orderConfirmVo.getItems() == null) {
                         return;
@@ -142,7 +153,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     List<Long> skuIds = orderConfirmVo.getItems().stream()
                             .map(CartItemVo::getSkuId).collect(Collectors.toList());
                     R r = wareFeignService.listHasStocksBySkuIds(skuIds);
-                    List<SkuHasStockTo> hasStocks = r.get("data", new TypeReference<List<SkuHasStockTo>>() {});
+                    List<SkuHasStockTo> hasStocks = r.get("data", new TypeReference<List<SkuHasStockTo>>() {
+                    });
                     Map<Long, Boolean> hasStockMap = hasStocks.stream()
                             .collect(Collectors.toMap(SkuHasStockTo::getSkuId, SkuHasStockTo::getHasStock));
                     orderConfirmVo.getItems().forEach(
@@ -171,7 +183,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     public OrderEntity submitOrder(MemberVo loginUser, SubmitOrderVo submit) {
         verifyOrderToken(loginUser.getId(), submit.getOrderToken());
 
-        CreateOrderTo createOrderTo = createOrder(loginUser, submit);
+        CreateOrderTo createOrderTo = createOrderForSecKill(loginUser, submit);
 
         //验价
         checkPrice(createOrderTo);
@@ -198,21 +210,230 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Override
     @Transactional
-    public void closeOrder(OrderEntity order) {
-        OrderEntity orderInDb = this.getById(order.getId());
-        if (!Objects.equals(orderInDb.getStatus(), OrderStatusEnum.CREATE_NEW.getCode())) {
-            return;
+    public void closeOrderByOrderSn(String orderSn) throws CloseOrderFailedException {
+        try {
+            OrderEntity orderInDb = this.getOrderByOrderSn(orderSn);
+            if (!Objects.equals(orderInDb.getStatus(), OrderStatusEnum.CREATE_NEW.getCode())) {
+                return;
+            }
+
+            //关闭支付宝订单
+            alipayTemplate.closeByOrderSn(orderInDb.getOrderSn());
+
+            this.updateStatus(orderInDb.getOrderSn(), OrderStatusEnum.CANCELLED.getCode());
+
+            OrderTo orderForMq = new OrderTo();
+            BeanUtils.copyProperties(orderInDb, orderForMq);
+            sendClosedOrderToMq(orderForMq);
+        } catch (Exception e) {
+            throw new CloseOrderFailedException(e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void closeSecKillOrder(CreateSecKillOrderTo createSecKillOrderTo) throws CloseOrderFailedException {
+        try {
+            OrderEntity orderInDb = this.getOrderByOrderSn(createSecKillOrderTo.getOrderSn());
+            if (!Objects.equals(orderInDb.getStatus(), OrderStatusEnum.CREATE_NEW.getCode())) {
+                return;
+            }
+
+            //关闭支付宝订单
+            alipayTemplate.closeByOrderSn(orderInDb.getOrderSn());
+
+            //修改订单状态为取消
+            this.updateStatus(orderInDb.getOrderSn(), OrderStatusEnum.CANCELLED.getCode());
+
+            //将取消订单事件发送给mq
+            sendReleaseSecKillStockEventToMq(createSecKillOrderTo);
+        } catch (Exception e) {
+            throw new CloseOrderFailedException(e);
+        }
+    }
+
+    private void sendReleaseSecKillStockEventToMq(CreateSecKillOrderTo createSecKillOrderTo) {
+        rabbitTemplate.convertAndSend(OrderConstant.MQ_ORDER_EVENT_EXCHANGE_NAME,
+                OrderConstant.MQ_SEC_KILL_RELEASE_STOCK_BINDING_ROUTING_KEY, createSecKillOrderTo);
+    }
+
+    @Override
+    public AlipayPayVo getAlipayPayVo(String orderSn) {
+        OrderEntity order = this.getOrderByOrderSn(orderSn);
+        List<OrderItemEntity> items = orderItemService.listByOrderSn(orderSn);
+
+        AlipayPayVo payVo = new AlipayPayVo();
+        payVo.setOutTradeNo(orderSn);
+        payVo.setTotalAmount(order.getTotalAmount().setScale(2, RoundingMode.UP).toPlainString());
+        payVo.setSubject(items.get(0).getSkuName() + " 等");
+        String body = items.stream().map(OrderItemEntity::getSkuName).collect(Collectors.joining("；"));
+        payVo.setBody(body);
+        return payVo;
+    }
+
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+    }
+
+    @Override
+    public PageUtils queryMemberOrdersPage(Long memberId, Map<String, Object> params) {
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                new QueryWrapper<OrderEntity>().eq("member_id", memberId).orderByDesc("create_time")
+        );
+
+        Set<String> orderSns = page.getRecords().stream().map(OrderEntity::getOrderSn).collect(Collectors.toSet());
+        List<OrderItemEntity> allItems =
+                orderItemService.list(new QueryWrapper<OrderItemEntity>().in("order_sn", orderSns));
+
+        IPage<MemberOrderVo> memberOrderPage =
+                Page.of(page.getCurrent(), page.getSize(), page.getTotal(), page.searchCount());
+        memberOrderPage.setRecords(page.getRecords().stream().map(order -> {
+            MemberOrderVo memberOrderVo = new MemberOrderVo();
+            memberOrderVo.setOrder(order);
+            memberOrderVo.setItems(allItems.stream().filter(
+                    item -> item.getOrderSn().equals(order.getOrderSn())).collect(Collectors.toList()));
+            return memberOrderVo;
+        }).collect(Collectors.toList()));
+
+        return new PageUtils(memberOrderPage);
+    }
+
+    @Override
+    @Transactional
+    public void handlePayment(PaymentInfoEntity payment) {
+        try {
+            paymentInfoService.save(payment);
+        } catch (DataAccessException e) {
+            log.error("插入付款记录失败：" + e);
         }
 
-        OrderEntity entForUpdate = new OrderEntity();
-        entForUpdate.setId(orderInDb.getId());
-        entForUpdate.setStatus(OrderStatusEnum.CANCELLED.getCode());
-//        entForUpdate.setDeleteStatus(OrderConstant.OrderDeleteStatusEnum.DELETED.getCode());
-        this.updateById(entForUpdate);
+        if (payment.getPaymentStatus().equals(AlipayTradeStatusEnum.TRADE_SUCCESS.toString()) ||
+                payment.getPaymentStatus().equals(AlipayTradeStatusEnum.TRADE_FINISHED.toString())) {
+            String orderSn = payment.getOrderSn();
+            this.updateStatus(orderSn, OrderStatusEnum.PAYED.getCode());
+        }
+    }
 
-        OrderTo orderForMq = new OrderTo();
-        BeanUtils.copyProperties(order, orderForMq);
-        sendClosedOrderToMq(orderForMq);
+    @Override
+    @Transactional
+    public void createSecKillOrder(CreateSecKillOrderTo createSecKillOrderTo) {
+        CreateOrderTo createOrderTo = createOrderForSecKill(createSecKillOrderTo);
+
+        //保存订单和订单项到数据库
+        saveOrder(createOrderTo);
+
+        //秒杀商品已提前锁定库存，无需再锁
+//        lockStockForOrder(createOrderTo);
+        //发送创建秒杀订单消息到MQ
+        sendCreatedSecKillOrderToMQ(createSecKillOrderTo);
+    }
+
+    private void sendCreatedSecKillOrderToMQ(CreateSecKillOrderTo createSecKillOrderTo) {
+        rabbitTemplate.convertAndSend(OrderConstant.MQ_ORDER_EVENT_EXCHANGE_NAME,
+                OrderConstant.MQ_ORDER_SEC_KILL_CREATE_ORDER_BINDING_ROUTING_KEY, createSecKillOrderTo);
+    }
+
+    private CreateOrderTo createOrderForSecKill(CreateSecKillOrderTo createSecKillOrderTo) {
+        CreateOrderTo to = new CreateOrderTo();
+
+        OrderEntity order = buildOrder(createSecKillOrderTo);
+//        order.setReceiveTime();
+
+//        List<OrderItemEntity> orderItems = buildOrderItems(order.getOrderSn());
+        OrderItemEntity orderItem = buildOrderItemForSecKill(createSecKillOrderTo);
+        List<OrderItemEntity> orderItems = Collections.singletonList(orderItem);
+        computePrice(order, orderItems);
+
+        to.setOrder(order);
+        to.setOrderItems(orderItems);
+
+        return to;
+    }
+
+    private OrderItemEntity buildOrderItemForSecKill(CreateSecKillOrderTo createSecKillOrderTo) {
+        OrderItemEntity orderItem = new OrderItemEntity();
+
+        CompletableFuture<Void> getSkuInfoAndSpuInfoFuture = CompletableFuture.supplyAsync(() -> {
+            R getSkuInfoR = productFeignService.getSkuInfoBySkuId(createSecKillOrderTo.getSkuId());
+            if (getSkuInfoR.getCode() == 0) {
+                SkuInfoVo skuInfo = getSkuInfoR.get("skuInfo", SkuInfoVo.class);
+                orderItem.setSkuPic(skuInfo.getSkuDefaultImg());
+                orderItem.setSkuName(skuInfo.getSkuName());
+                orderItem.setSkuPrice(skuInfo.getPrice());          //商品原始价格
+                orderItem.setSkuId(skuInfo.getSkuId());
+                return skuInfo.getSpuId();
+            }
+            return null;
+        }, executor).thenAccept(spuId -> {
+            if (spuId == null) {
+                return;
+            }
+            R getSpuInfoR = productFeignService.getSpuInfoBySpuId(spuId);
+            if (getSpuInfoR.getCode() == 0) {
+                SpuInfoVo spuInfo = getSpuInfoR.get("spuInfo", SpuInfoVo.class);
+                orderItem.setSpuName(spuInfo.getSpuName());
+                orderItem.setSpuBrand(spuInfo.getBrandId().toString());
+                orderItem.setSpuId(spuInfo.getId());
+                orderItem.setCategoryId(spuInfo.getCatalogId());
+            }
+        });
+
+        CompletableFuture<Void> getSaleAttrFuture = CompletableFuture.runAsync(() -> {
+            R getSaleAttrR = productFeignService.getSkuSaleAttrValueStrings(createSecKillOrderTo.getSkuId());
+            if (getSaleAttrR.getCode() == 0) {
+                List<String> attrValStrings = getSaleAttrR.get("data", new TypeReference<List<String>>() {
+                });
+                orderItem.setSkuAttrsVals(StringUtils.collectionToDelimitedString(attrValStrings, ";"));
+            }
+        }, executor);
+
+        orderItem.setOrderSn(createSecKillOrderTo.getOrderSn());
+        orderItem.setSkuQuantity(createSecKillOrderTo.getNum());
+
+        BigDecimal total = createSecKillOrderTo.getSeckillPrice().multiply(new BigDecimal(createSecKillOrderTo.getNum()));
+        orderItem.setGiftGrowth(total.intValue());
+        orderItem.setGiftIntegration(total.intValue());
+        orderItem.setPromotionAmount(new BigDecimal(0));
+        orderItem.setCouponAmount(new BigDecimal(0));
+        orderItem.setIntegrationAmount(new BigDecimal(0));
+        //实际金额
+        orderItem.setRealAmount(total
+                .subtract(orderItem.getPromotionAmount())
+                .subtract(orderItem.getCouponAmount())
+                .subtract(orderItem.getIntegrationAmount()));
+
+        CompletableFuture.allOf(getSkuInfoAndSpuInfoFuture, getSaleAttrFuture).join();
+
+        return orderItem;
+    }
+
+    private OrderEntity buildOrder(CreateSecKillOrderTo createSecKillOrderTo) {
+
+        OrderEntity order = new OrderEntity();
+        order.setMemberId(createSecKillOrderTo.getMemberId());
+        order.setOrderSn(createSecKillOrderTo.getOrderSn());
+
+        //暂时没有收获地址信息，需要用户确认页确定
+//        order.setFreightAmount(fare.getFare());
+//        order.setReceiverCity(fare.getAddress().getCity());
+//        order.setReceiverProvince(fare.getAddress().getProvince());
+//        order.setReceiverDetailAddress(fare.getAddress().getDetailAddress());
+//        order.setReceiverPhone(fare.getAddress().getPhone());
+//        order.setReceiverPostCode(fare.getAddress().getPostCode());
+//        order.setReceiverRegion(fare.getAddress().getRegion());
+//        order.setReceiverName(fare.getAddress().getName());
+
+        order.setDeleteStatus(OrderConstant.OrderDeleteStatusEnum.NOT_DELETED.getCode());
+        order.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        order.setAutoConfirmDay(ORDER_AUTO_CONFIRM_DAY);
+
+        return order;
+    }
+
+    private void updateStatus(String orderSn, Integer status) {
+        this.baseMapper.updateStatus(orderSn, status);
     }
 
     private void sendClosedOrderToMq(OrderTo order) {
@@ -254,18 +475,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         }
     }
 
-    private CreateOrderTo createOrder(MemberVo loginUser, SubmitOrderVo submit) {
+    private CreateOrderTo createOrderForSecKill(MemberVo loginUser, SubmitOrderVo submit) {
         CreateOrderTo to = new CreateOrderTo();
 
-        OrderEntity order = buildOrder(loginUser, submit);
+        OrderEntity order = buildOrder(loginUser.getId(), submit);
 //        order.setReceiveTime();
 
         List<OrderItemEntity> orderItems = buildOrderItems(order.getOrderSn());
         computePrice(order, orderItems);
-
-        order.setDeleteStatus(OrderConstant.OrderDeleteStatusEnum.NOT_DELETED.getCode());
-        order.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
-        order.setAutoConfirmDay(ORDER_AUTO_CONFIRM_DAY);
 
         to.setOrder(order);
         to.setOrderItems(orderItems);
@@ -290,7 +507,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             giftIntegration += item.getGiftIntegration();
         }
         order.setTotalAmount(total);
-        order.setPayAmount(total.add(order.getFreightAmount()));
+        order.setPayAmount(total);
         order.setIntegrationAmount(integration);
         order.setCouponAmount(coupon);
         order.setPromotionAmount(promotion);
@@ -298,9 +515,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         order.setGrowth(giftGrowth);
     }
 
-    private OrderEntity buildOrder(MemberVo loginUser, SubmitOrderVo submit) {
+    private OrderEntity buildOrder(Long loginUserId, SubmitOrderVo submit) {
         OrderEntity order = new OrderEntity();
-        order.setMemberId(loginUser.getId());
+        order.setMemberId(loginUserId);
         order.setOrderSn(IdWorker.getTimeId());
 
         R getFareR = wareFeignService.getFare(submit.getAddrId());
@@ -316,6 +533,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         order.setReceiverPostCode(fare.getAddress().getPostCode());
         order.setReceiverRegion(fare.getAddress().getRegion());
         order.setReceiverName(fare.getAddress().getName());
+
+        order.setDeleteStatus(OrderConstant.OrderDeleteStatusEnum.NOT_DELETED.getCode());
+        order.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        order.setAutoConfirmDay(ORDER_AUTO_CONFIRM_DAY);
 
         return order;
     }

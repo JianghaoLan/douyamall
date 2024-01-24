@@ -22,11 +22,13 @@ public enum BizCodeEnum {
      */
     UNKNOWN_EXCEPTION(10000, "系统未知异常"),
     VALID_EXCEPTION(10001, "参数校验不通过"),
+    TOO_MANY_REQUEST(10003, "请求过于频繁"),
 
     /**
      * 11 商品
      */
     PRODUCT_UP_EXCEPTION(11000, "商品上架异常"),
+    SEC_KILL_SERVICE_ACCESS_FAILED_EXCEPTION(11001, "访问秒杀服务失败"),
 
     /**
      * 12 库存
@@ -66,6 +68,7 @@ public enum BizCodeEnum {
      */
     SKU_NOT_EXISTS_EXCEPTION(16001, "购物车不存在此商品")
     ;
+
 
 
     private final int code;

@@ -522,8 +522,13 @@
                             <span>￥</span>
                             <span th:text="${#numbers.formatDecimal(item.info.price, 1, 2)}">4499.00</span>
                         </li>
-                        <li>
-                            预约享资格
+                        <li style="color: red" th:if="${item.secKillInfo != null}">
+                            <span th:if="${#dates.createNow().getTime() < item.secKillInfo.startTime}">
+                                商品将会在[[${#dates.format(new java.util.Date(item.secKillInfo.getStartTime()), 'yyyy-MM-dd HH:mm:ss')}]]进行秒杀
+                            </span>
+                            <span th:if="${#dates.createNow().getTime() >= item.secKillInfo.startTime && #dates.createNow().getTime() <= item.secKillInfo.endTime}">
+                                秒杀价：[[${#numbers.formatDecimal(item.secKillInfo.seckillPrice, 1, 2)}]]
+                            </span>
                         </li>
                         <li>
                             <a href="/static/item/">
@@ -643,7 +648,14 @@
 
                         </div>
                     </div>
-                    <div class="box-btns-two">
+                    <div class="box-btns-two"
+                         th:if="${item.secKillInfo != null && #dates.createNow().getTime() >= item.secKillInfo.startTime && #dates.createNow().getTime() <= item.secKillInfo.endTime}">
+                        <a href="#" id="secKillA" th:attr="skuId=${item.info.skuId}, sessionId=${item.secKillInfo.promotionSessionId}, token=${item.secKillInfo.randomToken}">
+                            立即抢购
+                        </a>
+                    </div>
+                    <div class="box-btns-two"
+                         th:if="${!(item.secKillInfo != null && #dates.createNow().getTime() >= item.secKillInfo.startTime && #dates.createNow().getTime() <= item.secKillInfo.endTime)}">
                         <a href="#" id="addToCartA" th:attr="skuId=${item.info.skuId}">
                             加入购物车
                         </a>
@@ -1319,6 +1331,21 @@
         const num = $('#numInput').val();
         const skuId = $(this).attr("skuId");
         location.href = "http://cart.douyamall.com/add?skuId=" + skuId + "&num=" + num;
+        return false;
+    })
+
+    $("#secKillA").click(function() {
+        // const isLogin = [[${session.loginUser != null}]];
+        const isLogin = true;
+        if (isLogin) {
+            const skuId = $(this).attr("skuId");
+            const sessionId = $(this).attr("sessionId");
+            const token = $(this).attr("token")
+            const num = $('#numInput').val();
+            location.href = `http://seckill.douyamall.com/kill?skuId=${skuId}&sessionId=${sessionId}&token=${token}&num=${num}`;
+        } else {
+            alert("请先登录！");
+        }
         return false;
     })
 </script>

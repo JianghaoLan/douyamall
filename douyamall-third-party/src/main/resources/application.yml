@@ -3,9 +3,21 @@ server:
 
 spring:
   cloud:
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
     nacos:
       discovery:
         server-addr: 172.16.2.132:8848
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
 #alibaba:
 #  cloud:
 #    access-key:
@@ -21,3 +33,6 @@ sms:
   template-id: TPL_0001
   app-code: 963bed44cfa6419981509d118a66daff
 
+feign:
+  sentinel:
+    enabled: true

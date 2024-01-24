@@ -1,6 +1,8 @@
 package org.lanjianghao.douyamall.product.service.impl;
 
+import org.lanjianghao.common.utils.R;
 import org.lanjianghao.douyamall.product.entity.*;
+import org.lanjianghao.douyamall.product.feign.SecKillFeignService;
 import org.lanjianghao.douyamall.product.service.*;
 import org.lanjianghao.douyamall.product.to.SkuSpuIdTo;
 import org.lanjianghao.douyamall.product.vo.*;
@@ -39,6 +41,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     AttrGroupService attrGroupService;
+
+    @Autowired
+    SecKillFeignService secKillFeignService;
 
     @Autowired
     ThreadPoolExecutor executor;
@@ -141,8 +146,22 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             item.setImages(skuImages);
         }, executor);
 
+        CompletableFuture<Void> getSecKillInfoFuture = CompletableFuture.runAsync(() -> {
+            R getSecKillInfoR = secKillFeignService.getSecKillInfo(skuId);
+            if (getSecKillInfoR.getCode() == 0) {
+                SecKillSkuVo secKillInfo = getSecKillInfoR.get("data", SecKillSkuVo.class);
+                item.setSecKillInfo(secKillInfo);
+            }
+        }, executor);
+
         try {
-            CompletableFuture.allOf(descFuture, saleAttrsFuture, attrGroupsFuture, imagesFuture).get();
+            CompletableFuture.allOf(
+                    descFuture,
+                    saleAttrsFuture,
+                    attrGroupsFuture,
+                    imagesFuture,
+                    getSecKillInfoFuture)
+                    .get();
         } catch (InterruptedException | ExecutionException ignored) { }
 
         return item;

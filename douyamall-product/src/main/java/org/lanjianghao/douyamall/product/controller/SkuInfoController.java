@@ -90,4 +90,10 @@ public class SkuInfoController {
         List<SkuPriceVo> prices = skuInfoService.listPricesBySkuIds(skuIds);
         return R.ok().put("data", prices);
     }
+
+    @PostMapping("/infos")
+    public R infos(@RequestBody List<Long> skuIds) {
+        List<SkuInfoEntity> skuInfos = skuInfoService.listByIds(skuIds);
+        return R.ok().put("data", skuInfos);
+    }
 }

@@ -3,6 +3,12 @@ spring:
     nacos:
       discovery:
         server-addr: 172.16.2.132:8848
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
+      filter:
+        enabled: false
 
     gateway:
       routes:
@@ -27,6 +33,13 @@ spring:
           filters:
             - RewritePath=/api/?(?<segment>.*), /$\{segment}
 
+        - id: coupon_route
+          uri: lb://douyamall-coupon
+          predicates:
+            - Path=/api/coupon/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
+
         - id: third_party_route
           uri: lb://douyamall-third-party
           predicates:
@@ -41,30 +54,40 @@ spring:
           filters:    # http://localhost:88/api/captcha.jpg => http://localhost:8080/renren-fast/captcha.jpg
             - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
 
-        - id: host_route
+        - id: douyamall_host_route
           uri: lb://douyamall-product
           predicates:
             - Host=douyamall.com, item.douyamall.com
 
-        - id: search_route
+        - id: douyamall_search_route
           uri: lb://douyamall-search
           predicates:
             - Host=search.douyamall.com
 
-        - id: auth_route
+        - id: douyamall_auth_route
           uri: lb://douyamall-auth
           predicates:
             - Host=auth.douyamall.com
 
-        - id: cart_route
+        - id: douyamall_cart_route
           uri: lb://douyamall-cart
           predicates:
             - Host=cart.douyamall.com
 
-        - id: order_route
+        - id: douyamall_order_route
           uri: lb://douyamall-order
           predicates:
             - Host=order.douyamall.com
+
+        - id: douyamall_member_route
+          uri: lb://douyamall-member
+          predicates:
+            - Host=member.douyamall.com
+
+        - id: douyamall_seckill_route
+          uri: lb://douyamall-seckill
+          predicates:
+            - Host=seckill.douyamall.com
 
       globalcors:
         cors-configurations:
@@ -74,5 +97,18 @@ spring:
             allowedMethods: "*"
             allowCredentials: true
 
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+
 server:
   port: 88
+
+feign:
+  sentinel:
+    enabled: true

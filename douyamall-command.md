@@ -142,6 +142,20 @@ docker update rabbitmq --restart=always
 
 https://rabbitmq.com/networking.html#ports
 
+## Zipkin
+
+docker运行命令：
+
+```shell
+docker run --name zipkin -d -p 9411:9411 openzipkin/zipkin
+```
+
+设置自动启动：
+
+```shell
+docker update zipkin --restart=always
+```
+
 ## nacos
 
 
@@ -152,3 +166,18 @@ https://rabbitmq.com/networking.html#ports
 ```
 startup.cmd -m standalone
 ```
+
+## Sentinel Dashboard
+
+程序位置：笔记本C:\software\sentinel-dashboard-1.8.6
+
+请使用端口8333
+
+启动命令：
+
+```shell
+java -jar sentinel-dashboard-1.8.6.jar --server.port=8333
+```
+
+访问控制台：http://localhost:8333
+用户名密码均为sentinel

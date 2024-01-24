@@ -20,8 +20,26 @@
 #    db-config:
 #      id-type: auto   #自增主键
 
+
 #server:
 #  port: 7000
 logging:
   level:
     org.lanjianghao.douyamall: debug
+spring:
+  cloud:
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: localhost:8333
+  zipkin:
+    base-url: http://172.16.2.132:9411/
+    discovery-client-enabled: false
+    sender:
+      type: web
+  sleuth:
+    sampler:
+      probability: 1
+feign:
+  sentinel:
+    enabled: true

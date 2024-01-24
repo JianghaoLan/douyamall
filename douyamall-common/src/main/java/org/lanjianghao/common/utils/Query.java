@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.lanjianghao.common.xss.SQLFilter;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 查询参数
@@ -33,10 +34,10 @@ public class Query<T> {
         long limit = 10;
 
         if(params.get(Constant.PAGE) != null){
-            curPage = Long.parseLong((String)params.get(Constant.PAGE));
+            curPage = Long.parseLong(Objects.toString(params.get(Constant.PAGE)));
         }
         if(params.get(Constant.LIMIT) != null){
-            limit = Long.parseLong((String)params.get(Constant.LIMIT));
+            limit = Long.parseLong(Objects.toString(params.get(Constant.LIMIT)));
         }
 
         //分页对象
