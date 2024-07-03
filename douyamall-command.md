@@ -183,3 +183,9 @@ java -jar sentinel-dashboard-1.8.6.jar --server.port=8333
 
 访问控制台：http://localhost:8333
 用户名密码均为sentinel
+
+## k8s集群
+
+位置：台式机上
+
+root密码：vagrant
